@@ -2,428 +2,797 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Login - Batangas Premium Naga</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>Login — Batangas Premium Naga</title>
   <link rel="stylesheet" href="css/style.css">
   <script src="https://kit.fontawesome.com/2771f4216a.js" crossorigin="anonymous"></script>
   <style>
-    .auth-wrap {
-      min-height: 80vh; display: flex; align-items: center;
-      justify-content: center; padding: var(--space-8); background: var(--gray-50);
-    }
-    .auth-card {
-      max-width: 440px; width: 100%; background: white;
-      border-radius: var(--radius-xl); box-shadow: var(--shadow-lg); padding: 36px 32px;
-    }
-    .auth-logo { text-align: center; margin-bottom: 28px; }
-    .auth-logo-icon {
-      width: 60px; height: 60px;
-      background: linear-gradient(135deg, #dc2626, #f97316);
-      border-radius: 16px; display: flex; align-items: center;
-      justify-content: center; margin: 0 auto 14px;
-    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', system-ui, sans-serif; background: #f8fafc; min-height: 100vh; }
 
-    /* Password toggle */
-    .pw-wrap { position: relative; }
-    .pw-wrap .form-input { padding-right: 48px; }
-    .pw-toggle {
-      position: absolute; right: 14px; top: 50%; transform: translateY(-50%);
-      background: none; border: none; cursor: pointer; color: var(--gray-400);
-      font-size: 16px; padding: 0; display: flex; align-items: center; z-index: 2;
-      transition: color .2s;
+    /* Two-column layout */
+    .auth-layout { display: grid; grid-template-columns: 1fr 1fr; min-height: 100vh; }
+
+    /* Left brand panel */
+    .auth-brand {
+      background: linear-gradient(145deg, #dc2626 0%, #991b1b 45%, #1e0a0a 100%);
+      display: flex; flex-direction: column; justify-content: center;
+      align-items: flex-start; padding: 60px 56px; position: relative; overflow: hidden;
     }
-    .pw-toggle:hover { color: var(--gray-700); }
+    .auth-brand::before {
+      content:''; position:absolute; top:-120px; right:-120px;
+      width:400px; height:400px; border-radius:50%; background:rgba(249,115,22,.15);
+    }
+    .auth-brand::after {
+      content:''; position:absolute; bottom:-80px; left:-80px;
+      width:300px; height:300px; border-radius:50%; background:rgba(255,255,255,.04);
+    }
+    .brand-logo { display:flex; align-items:center; gap:14px; margin-bottom:52px; position:relative; z-index:1; }
+    .brand-logo-icon {
+      width:52px; height:52px; background:rgba(255,255,255,.12);
+      border:1.5px solid rgba(255,255,255,.2); border-radius:14px;
+      display:flex; align-items:center; justify-content:center; font-size:22px;
+    }
+    .brand-logo-text { color:white; font-size:16px; font-weight:700; }
+    .brand-logo-sub  { color:rgba(255,255,255,.6); font-size:12px; }
+    .brand-headline  { font-size:2.2rem; font-weight:800; color:white; line-height:1.2; margin-bottom:16px; position:relative; z-index:1; }
+    .brand-headline span { color:#f97316; }
+    .brand-sub { color:rgba(255,255,255,.65); font-size:14px; line-height:1.6; margin-bottom:36px; position:relative; z-index:1; }
+    .brand-features { position:relative; z-index:1; display:flex; flex-direction:column; gap:12px; }
+    .brand-feat {
+      display:flex; align-items:center; gap:12px;
+      background:rgba(255,255,255,.07); border:1px solid rgba(255,255,255,.1);
+      border-radius:12px; padding:12px 16px;
+    }
+    .brand-feat-icon {
+      width:34px; height:34px; background:rgba(249,115,22,.25);
+      border-radius:8px; display:flex; align-items:center; justify-content:center;
+      color:#f97316; font-size:14px; flex-shrink:0;
+    }
+    .brand-feat-text { color:rgba(255,255,255,.88); font-size:13px; font-weight:500; }
+
+    /* Right form panel */
+    .auth-form-side {
+      display:flex; flex-direction:column; justify-content:center;
+      align-items:center; padding:40px 32px; background:white; overflow-y:auto;
+    }
+    .auth-box { width:100%; max-width:420px; }
+
+    /* Header */
+    .auth-hdr { text-align:center; margin-bottom:28px; }
+    .auth-hdr h1 { font-size:1.7rem; font-weight:800; color:#111; margin-bottom:6px; }
+    .auth-hdr p  { font-size:13px; color:#6b7280; }
+
+    /* Fields */
+    .field { margin-bottom:16px; }
+    .field label { display:block; font-size:13px; font-weight:600; color:#374151; margin-bottom:5px; }
+    .inp-wrap { position:relative; }
+    .inp-wrap .fi { position:absolute; left:13px; top:50%; transform:translateY(-50%); color:#9ca3af; font-size:14px; pointer-events:none; }
+    .inp-wrap input {
+      width:100%; padding:12px 12px 12px 40px; border:1.5px solid #e5e7eb;
+      border-radius:11px; font-size:15px; color:#111; background:#fafafa;
+      outline:none; transition:all .2s; font-family:inherit;
+    }
+    .inp-wrap input:focus { border-color:#dc2626; background:white; box-shadow:0 0 0 3px rgba(220,38,38,.08); }
+    .inp-wrap input.err { border-color:#dc2626; background:#fff5f5; }
+    .inp-wrap input::placeholder { color:#9ca3af; }
+    .pw-eye {
+      position:absolute; right:13px; top:50%; transform:translateY(-50%);
+      background:none; border:none; cursor:pointer; color:#9ca3af; font-size:15px;
+    }
+    .pw-eye:hover { color:#6b7280; }
+    .ferr { font-size:12px; color:#dc2626; margin-top:4px; display:none; }
+    .ferr.show { display:block; }
 
     /* Password strength */
-    .strength-bar { height: 4px; border-radius: 2px; margin-top: 6px; background: #e5e7eb; overflow: hidden; }
-    .strength-fill { height: 100%; width: 0%; border-radius: 2px; transition: width .3s, background .3s; }
+    .str-segs { display:flex; gap:4px; margin-top:7px; }
+    .str-seg  { flex:1; height:3px; border-radius:2px; background:#e5e7eb; transition:background .3s; }
+    .str-lbl  { font-size:11px; margin-top:4px; font-weight:600; }
 
-    /* Google button */
+    /* Buttons */
+    .btn-red {
+      width:100%; padding:13px; background:linear-gradient(135deg,#dc2626,#f97316);
+      color:white; border:none; border-radius:11px; font-size:15px; font-weight:700;
+      cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px;
+      font-family:inherit; transition:opacity .15s;
+    }
+    .btn-red:hover { opacity:.9; }
+    .btn-red:disabled { opacity:.5; cursor:not-allowed; }
+    .btn-out {
+      width:100%; padding:12px; background:white; border:1.5px solid #e5e7eb;
+      border-radius:11px; font-size:14px; font-weight:500; color:#374151;
+      cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px;
+      font-family:inherit; transition:all .2s; margin-top:8px;
+    }
+    .btn-out:hover { background:#f9fafb; border-color:#d1d5db; }
+
+    /* Google btn */
     .google-btn {
-      width: 100%; padding: 12px 16px; border: 1.5px solid #e5e7eb; border-radius: 10px;
-      background: white; display: flex; align-items: center; justify-content: center; gap: 10px;
-      font-size: 15px; font-weight: 500; color: #374151; cursor: pointer;
-      transition: all .2s; margin-bottom: 16px; font-family: inherit;
+      width:100%; padding:12px; border:1.5px solid #e5e7eb; border-radius:11px;
+      background:white; font-size:14px; font-weight:600; color:#374151;
+      cursor:pointer; display:flex; align-items:center; justify-content:center; gap:10px;
+      font-family:inherit; transition:all .2s; margin-bottom:6px;
     }
-    .google-btn:hover { background: #f9fafb; border-color: #9ca3af; box-shadow: 0 2px 8px rgba(0,0,0,.08); }
-    .google-btn svg { width: 20px; height: 20px; flex-shrink: 0; }
+    .google-btn:hover { background:#f9fafb; border-color:#d1d5db; }
 
-    .divider {
-      display: flex; align-items: center; gap: 12px;
-      color: var(--gray-400); font-size: 13px; margin: 16px 0;
-    }
-    .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: var(--gray-200); }
+    /* Divider */
+    .divider { display:flex; align-items:center; gap:10px; font-size:12px; color:#9ca3af; margin:16px 0; }
+    .divider::before,.divider::after { content:''; flex:1; height:1px; background:#f3f4f6; }
 
-    .remember-row {
-      display: flex; align-items: center; justify-content: space-between;
-      margin-bottom: 16px; font-size: 13px;
-    }
-    .remember-label {
-      display: flex; align-items: center; gap: 8px;
-      cursor: pointer; color: var(--gray-600); user-select: none;
-    }
-    .remember-label input { width: 16px; height: 16px; accent-color: #dc2626; cursor: pointer; }
-    .forgot-btn {
-      background: none; border: none; font-size: 13px;
-      color: #dc2626; font-weight: 500; cursor: pointer; padding: 0;
-    }
-    .forgot-btn:hover { text-decoration: underline; }
+    /* Util row */
+    .util-row { display:flex; align-items:center; justify-content:space-between; margin-bottom:18px; font-size:13px; }
+    .chk-lbl  { display:flex; align-items:center; gap:7px; cursor:pointer; color:#6b7280; user-select:none; }
+    .chk-lbl input { width:15px; height:15px; accent-color:#dc2626; cursor:pointer; }
+    .lnk-btn  { background:none; border:none; color:#dc2626; font-weight:600; cursor:pointer; font-size:13px; font-family:inherit; }
+    .lnk-btn:hover { text-decoration:underline; }
 
-    .hint { font-size: 12px; margin-top: 4px; display: none; }
-    .hint.show { display: block; }
+    /* Toggle */
+    .toggle-row { text-align:center; font-size:13px; color:#6b7280; margin-top:18px; }
+    .toggle-row button { background:none; border:none; color:#dc2626; font-weight:700; cursor:pointer; font-size:13px; font-family:inherit; }
 
-    /* Forgot modal */
-    .fp-overlay {
-      position: fixed; inset: 0; background: rgba(0,0,0,.5);
-      z-index: 9999; display: flex; align-items: center;
-      justify-content: center; padding: 16px;
+    /* Demo hint */
+    .demo-hint { background:#eff6ff; border:1px solid #bfdbfe; border-radius:10px; padding:10px 14px; font-size:12px; color:#1d4ed8; margin-top:16px; }
+
+    /* ── OTP Styles ── */
+    .steps-row { display:flex; align-items:center; justify-content:center; margin-bottom:24px; }
+    .s-item    { display:flex; flex-direction:column; align-items:center; gap:4px; }
+    .s-circle  {
+      width:34px; height:34px; border-radius:50%;
+      display:flex; align-items:center; justify-content:center;
+      font-size:12px; font-weight:700; border:2px solid #e5e7eb;
+      background:white; color:#9ca3af; transition:all .3s;
     }
-    .fp-box {
-      background: white; border-radius: 16px; padding: 32px;
-      width: 100%; max-width: 400px;
+    .s-circle.done   { background:#16a34a; border-color:#16a34a; color:white; }
+    .s-circle.active { background:#dc2626; border-color:#dc2626; color:white; box-shadow:0 0 0 4px rgba(220,38,38,.15); }
+    .s-label  { font-size:10px; color:#9ca3af; font-weight:500; }
+    .s-label.active { color:#dc2626; }
+    .s-label.done   { color:#16a34a; }
+    .s-line   { width:44px; height:2px; background:#e5e7eb; margin-bottom:18px; transition:background .3s; }
+    .s-line.done { background:#16a34a; }
+
+    .email-badge {
+      display:flex; align-items:center; gap:10px;
+      background:#f9fafb; border:1px solid #f0f0f0; border-radius:11px;
+      padding:12px 14px; margin-bottom:18px;
+    }
+    .email-badge-icon {
+      width:34px; height:34px; background:#fee2e2; border-radius:8px;
+      display:flex; align-items:center; justify-content:center; color:#dc2626; flex-shrink:0;
+    }
+    .email-badge-addr { font-weight:700; color:#111; font-size:14px; }
+    .email-badge-sub  { font-size:12px; color:#9ca3af; }
+
+    /* OTP cells */
+    .otp-grid { display:flex; gap:8px; justify-content:center; margin:20px 0; }
+    .otp-cell {
+      width:50px; height:58px; border:2px solid #e5e7eb; border-radius:11px;
+      font-size:24px; font-weight:800; text-align:center; outline:none;
+      background:#fafafa; color:#dc2626; transition:all .2s; caret-color:transparent;
+    }
+    .otp-cell:focus { border-color:#dc2626; background:white; box-shadow:0 0 0 3px rgba(220,38,38,.1); }
+    .otp-cell.filled   { border-color:#f97316; background:#fff8f5; }
+    .otp-cell.shaking  { animation:shake .4s ease; border-color:#dc2626; background:#fff5f5; }
+    .otp-cell.ok       { border-color:#16a34a; background:#f0fdf4; }
+
+    @keyframes shake { 0%,100%{transform:translateX(0)} 25%,75%{transform:translateX(-5px)} 50%{transform:translateX(5px)} }
+
+    .timer-row  { display:flex; align-items:center; justify-content:space-between; margin-bottom:18px; }
+    .timer-pill {
+      display:flex; align-items:center; gap:6px;
+      background:#fff7ed; border:1px solid #fed7aa; border-radius:999px;
+      padding:4px 12px; color:#ea580c; font-weight:700; font-size:13px;
+    }
+    .timer-pill.exp { background:#fee2e2; border-color:#fca5a5; color:#dc2626; }
+    .resend-btn { background:none; border:none; color:#dc2626; font-weight:600; cursor:pointer; font-size:13px; font-family:inherit; }
+    .resend-btn:hover { text-decoration:underline; }
+    .resend-btn:disabled { color:#9ca3af; cursor:not-allowed; text-decoration:none; }
+    .otp-err { font-size:13px; color:#dc2626; text-align:center; margin-bottom:10px; display:none; }
+    .otp-err.show { display:block; }
+
+    /* Success */
+    .success-wrap { text-align:center; padding:16px 0; }
+    .success-ring {
+      width:84px; height:84px; border-radius:50%;
+      background:linear-gradient(135deg,#16a34a,#22c55e);
+      display:flex; align-items:center; justify-content:center;
+      margin:0 auto 20px; font-size:34px;
+      box-shadow:0 0 0 8px #dcfce7, 0 0 0 16px #f0fdf4;
+    }
+    .success-wrap h2 { font-size:1.4rem; font-weight:800; color:#111; margin-bottom:8px; }
+    .success-wrap p  { font-size:13px; color:#6b7280; margin-bottom:20px; line-height:1.6; }
+    .redir-pill {
+      display:inline-flex; align-items:center; gap:8px;
+      background:#f9fafb; border:1px solid #e5e7eb; border-radius:999px;
+      padding:7px 16px; font-size:13px; color:#6b7280; margin-bottom:20px;
+    }
+
+    /* Modal */
+    .modal-bg {
+      position:fixed; inset:0; background:rgba(0,0,0,.5);
+      z-index:9999; display:flex; align-items:center; justify-content:center; padding:20px;
+      backdrop-filter:blur(4px);
+    }
+    .modal-box {
+      background:white; border-radius:18px; padding:28px;
+      width:100%; max-width:400px; box-shadow:0 20px 60px rgba(0,0,0,.2);
+    }
+    .modal-box h3 { font-size:1.1rem; font-weight:700; margin-bottom:6px; }
+    .modal-box p  { font-size:13px; color:#6b7280; margin-bottom:18px; }
+
+    /* Toast */
+    #toast {
+      position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(20px);
+      z-index:99999; min-width:260px; max-width:380px; padding:13px 18px;
+      border-radius:12px; font-size:14px; font-weight:500;
+      display:flex; align-items:center; gap:10px;
+      box-shadow:0 8px 24px rgba(0,0,0,.12); opacity:0;
+      transition:all .3s ease; pointer-events:none;
+    }
+
+    /* Responsive */
+    @media (max-width:768px) {
+      .auth-layout { grid-template-columns:1fr; }
+      .auth-brand  { display:none; }
+      .auth-form-side { padding:32px 20px; min-height:100vh; }
+      .otp-cell { width:44px; height:52px; font-size:20px; }
+      .otp-grid { gap:6px; }
     }
   </style>
 </head>
 <body>
-  <header class="header">
-    <div class="container header-content">
-      <a href="index.html" class="logo">
-        <div class="logo-icon"><i class="fas fa-utensils"></i></div>
-        <div>
-          <div class="logo-text">Batangas Premium Naga</div>
-          <div class="logo-subtext">Noona's Food Station</div>
+
+<div class="auth-layout">
+
+  <!-- ════ LEFT BRAND ════ -->
+  <div class="auth-brand">
+    <div class="brand-logo">
+      <div class="brand-logo-icon">🍖</div>
+      <div>
+        <div class="brand-logo-text">Batangas Premium Naga</div>
+        <div class="brand-logo-sub">Noona's Food Station</div>
+      </div>
+    </div>
+    <h1 class="brand-headline">Fresh. Fast.<br><span>Delivered</span> to<br>your door.</h1>
+    <p class="brand-sub">Premium frozen goods and authentic Filipino<br>meals — straight from Naga City.</p>
+    <div class="brand-features">
+      <div class="brand-feat"><div class="brand-feat-icon"><i class="fas fa-shield-halved"></i></div><div class="brand-feat-text">Secure email-verified accounts</div></div>
+      <div class="brand-feat"><div class="brand-feat-icon"><i class="fas fa-bolt"></i></div><div class="brand-feat-text">Fast ordering & real-time tracking</div></div>
+      <div class="brand-feat"><div class="brand-feat-icon"><i class="fas fa-star"></i></div><div class="brand-feat-text">Premium quality, guaranteed fresh</div></div>
+    </div>
+  </div>
+
+  <!-- ════ RIGHT FORM ════ -->
+  <div class="auth-form-side">
+    <div class="auth-box">
+
+      <!-- ══ LOGIN PANEL ══ -->
+      <div id="login-panel">
+        <div class="auth-hdr">
+          <h1>Welcome back 👋</h1>
+          <p>Sign in to continue ordering</p>
         </div>
-      </a>
-      <nav class="nav">
-        <a href="index.html" class="nav-link">Home</a>
-        <a href="menu.html"  class="nav-link">Menu</a>
-        <a href="about.html" class="nav-link">About</a>
-        <a href="contact.html" class="nav-link">Contact</a>
-        <a href="cart.html" class="nav-link cart-icon-wrapper">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
-            <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+
+        <button class="google-btn" onclick="signInWithGoogle()">
+          <svg width="18" height="18" viewBox="0 0 48 48">
+            <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+            <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+            <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+            <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
           </svg>
-          <span class="cart-badge">0</span>
-        </a>
-      </nav>
-    </div>
-  </header>
+          Continue with Google
+        </button>
 
-  <div class="auth-wrap">
-    <div class="auth-card">
+        <div class="divider">or sign in with email</div>
 
-      <div class="auth-logo">
-        <div class="auth-logo-icon">
-          <i class="fas fa-utensils" style="color:white;font-size:26px;"></i>
-        </div>
-        <h1 id="page-title" style="font-size:1.5rem;font-weight:700;margin-bottom:4px;">Welcome Back</h1>
-        <p id="page-subtitle" style="color:var(--gray-500);font-size:.875rem;">Sign in to your account</p>
+        <form id="login-form" novalidate>
+          <div class="field">
+            <label>Email address</label>
+            <div class="inp-wrap">
+              <i class="fas fa-envelope fi"></i>
+              <input type="email" id="login-email" placeholder="you@email.com" autocomplete="email">
+            </div>
+          </div>
+          <div class="field">
+            <label>Password</label>
+            <div class="inp-wrap">
+              <i class="fas fa-lock fi"></i>
+              <input type="password" id="login-pass" placeholder="Your password" autocomplete="current-password" style="padding-right:44px;">
+              <button type="button" class="pw-eye" onclick="togglePw('login-pass','eye-lp')"><i id="eye-lp" class="fa-regular fa-eye"></i></button>
+            </div>
+          </div>
+          <div class="util-row">
+            <label class="chk-lbl"><input type="checkbox" id="remember-me"> Remember me</label>
+            <button type="button" class="lnk-btn" onclick="openForgot()">Forgot password?</button>
+          </div>
+          <button type="submit" class="btn-red"><i class="fas fa-right-to-bracket"></i> Sign In</button>
+        </form>
+
+        <div class="demo-hint"><i class="fas fa-circle-info" style="margin-right:6px;"></i><strong>Demo:</strong> admin@batangas.com · password: admin</div>
+
+        <div class="toggle-row">Don't have an account? <button onclick="showReg()">Create one free</button></div>
       </div>
 
-      <!-- ── Google Sign-In Button ── -->
-      <button class="google-btn" id="google-btn" onclick="signInWithGoogle()">
-        <!-- Official Google G logo SVG -->
-        <svg viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
-          <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
-          <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
-          <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
-          <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
-          <path fill="none" d="M0 0h48v48H0z"/>
-        </svg>
-        Continue with Google
-      </button>
+      <!-- ══ REGISTER PANEL ══ -->
+      <div id="reg-panel" style="display:none;">
 
-      <div class="divider">OR</div>
-
-      <!-- ── LOGIN FORM ── -->
-      <form id="login-form">
-        <div class="form-group">
-          <label class="form-label">Email</label>
-          <input type="email" name="email" id="login-email" class="form-input" required placeholder="you@email.com">
-        </div>
-
-        <div class="form-group" style="margin-bottom:8px;">
-          <label class="form-label">Password</label>
-          <div class="pw-wrap">
-            <input type="password" name="password" id="login-pass" class="form-input" required placeholder="Your password">
-            <button type="button" class="pw-toggle" onclick="togglePw('login-pass','eye-login')">
-              <i id="eye-login" class="fa-regular fa-eye"></i>
-            </button>
+        <!-- STEP 1: Form -->
+        <div id="rg1">
+          <div class="auth-hdr">
+            <h1>Create account ✨</h1>
+            <p>Join and start ordering today</p>
           </div>
-        </div>
 
-        <div class="remember-row">
-          <label class="remember-label">
-            <input type="checkbox" id="remember-me">
-            Remember me
-          </label>
-          <button type="button" class="forgot-btn" onclick="openForgot()">Forgot your password?</button>
-        </div>
-
-        <button type="submit" class="btn btn-primary" style="width:100%;padding:13px;font-size:15px;">
-          <i class="fas fa-sign-in-alt" style="margin-right:8px;"></i>Sign In
-        </button>
-      </form>
-
-      <!-- ── REGISTER FORM ── -->
-      <form id="register-form" class="hidden">
-        <div class="form-group">
-          <label class="form-label">Full Name *</label>
-          <input type="text" name="fullName" class="form-input" required placeholder="Juan dela Cruz">
-        </div>
-        <div class="form-group">
-          <label class="form-label">Phone</label>
-          <input type="tel" name="phone" class="form-input" placeholder="+63 9XX XXX XXXX">
-        </div>
-        <div class="form-group">
-          <label class="form-label">Email *</label>
-          <input type="email" name="email" class="form-input" required placeholder="you@email.com">
-        </div>
-        <div class="form-group">
-          <label class="form-label">Password *</label>
-          <div class="pw-wrap">
-            <input type="password" name="password" id="reg-pass" class="form-input" required placeholder="Min. 6 characters"
-              oninput="checkStrength(this.value)">
-            <button type="button" class="pw-toggle" onclick="togglePw('reg-pass','eye-reg')">
-              <i id="eye-reg" class="fa-regular fa-eye"></i>
-            </button>
-          </div>
-          <div class="strength-bar" id="str-bar" style="display:none;">
-            <div class="strength-fill" id="str-fill"></div>
-          </div>
-          <p class="hint" id="str-label"></p>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Confirm Password *</label>
-          <div class="pw-wrap">
-            <input type="password" name="confirmPassword" id="confirm-pass" class="form-input" required placeholder="Repeat password"
-              oninput="checkMatch()">
-            <button type="button" class="pw-toggle" onclick="togglePw('confirm-pass','eye-confirm')">
-              <i id="eye-confirm" class="fa-regular fa-eye"></i>
-            </button>
-          </div>
-          <p class="hint" id="match-hint"></p>
-        </div>
-        <button type="submit" class="btn btn-primary" style="width:100%;padding:13px;font-size:15px;">
-          <i class="fas fa-user-plus" style="margin-right:8px;"></i>Create Account
-        </button>
-      </form>
-
-      <div style="margin-top:16px;">
-        <button onclick="toggleMode()" class="btn btn-outline" style="width:100%;padding:11px;">
-          <span id="toggle-text">Don't have an account? Register</span>
-        </button>
-      </div>
-
-      <!-- Demo hint -->
-      <div style="background:#dbeafe;border:1px solid #2563eb;border-radius:10px;padding:12px 16px;margin-top:16px;font-size:13px;color:#1d4ed8;">
-        <strong><i class="fas fa-circle-info" style="margin-right:4px;"></i>Demo Login:</strong>
-        &nbsp;admin@batangas.com &nbsp;|&nbsp; password: admin
-      </div>
-
-    </div>
-  </div>
-
-  <!-- ── Forgot Password Modal ── -->
-  <div id="forgot-modal" style="display:none;">
-    <div class="fp-overlay" onclick="closeForgot()">
-      <div class="fp-box" onclick="event.stopPropagation()">
-        <h2 style="font-size:1.1rem;font-weight:700;margin-bottom:8px;">Reset Password</h2>
-        <p style="font-size:13px;color:var(--gray-500);margin-bottom:20px;">
-          Enter your registered email address. For this demo, please contact the admin directly.
-        </p>
-        <div class="form-group">
-          <label class="form-label">Email Address</label>
-          <input type="email" id="forgot-email" class="form-input" placeholder="you@email.com">
-        </div>
-        <div style="display:flex;gap:12px;margin-top:16px;">
-          <button onclick="submitForgot()" class="btn btn-primary" style="flex:1;">
-            <i class="fas fa-paper-plane" style="margin-right:6px;"></i>Send Link
+          <button class="google-btn" onclick="signInWithGoogle()">
+            <svg width="18" height="18" viewBox="0 0 48 48">
+              <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+              <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+              <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+              <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+            </svg>
+            Sign up with Google
           </button>
-          <button onclick="closeForgot()" class="btn btn-outline" style="flex:1;">Cancel</button>
-        </div>
-        <div id="forgot-ok" style="display:none;margin-top:14px;padding:12px;background:#dcfce7;border-radius:8px;font-size:13px;color:#15803d;">
-          <i class="fas fa-circle-check" style="margin-right:6px;"></i>If this email is registered, a reset link has been sent.
-        </div>
-      </div>
-    </div>
-  </div>
 
-  <footer class="footer">
-    <div class="container">
-      <div class="footer-grid">
-        <div>
-          <h3>Batangas Premium Naga</h3>
-          <p style="margin-bottom:var(--space-4);">Your trusted partner for premium frozen goods and delicious Filipino meals in Naga City.</p>
-          <div class="social-links">
-            <a href="#" class="social-link"><i class="fab fa-facebook-f"></i></a>
-            <a href="#" class="social-link"><i class="fab fa-instagram"></i></a>
+          <div class="divider">or sign up with email</div>
+
+          <form id="reg-form" novalidate>
+            <div class="field">
+              <label>Full Name</label>
+              <div class="inp-wrap"><i class="fas fa-user fi"></i><input type="text" id="rg-name" placeholder="Juan dela Cruz"></div>
+              <div class="ferr" id="e-name">Please enter your full name.</div>
+            </div>
+
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+              <div class="field">
+                <label>Phone</label>
+                <div class="inp-wrap"><i class="fas fa-phone fi"></i><input type="tel" id="rg-phone" placeholder="09XX XXX XXXX"></div>
+              </div>
+              <div class="field">
+                <label>Email</label>
+                <div class="inp-wrap"><i class="fas fa-envelope fi"></i><input type="email" id="rg-email" placeholder="you@email.com"></div>
+                <div class="ferr" id="e-email">Enter a valid email.</div>
+              </div>
+            </div>
+
+            <div class="field">
+              <label>Password</label>
+              <div class="inp-wrap">
+                <i class="fas fa-lock fi"></i>
+                <input type="password" id="rg-pass" placeholder="Min. 8 characters" oninput="updStr(this.value)" style="padding-right:44px;">
+                <button type="button" class="pw-eye" onclick="togglePw('rg-pass','eye-rp')"><i id="eye-rp" class="fa-regular fa-eye"></i></button>
+              </div>
+              <div class="str-segs" id="str-segs" style="display:none;"><div class="str-seg" id="ss0"></div><div class="str-seg" id="ss1"></div><div class="str-seg" id="ss2"></div><div class="str-seg" id="ss3"></div></div>
+              <div class="str-lbl" id="str-lbl" style="display:none;"></div>
+              <div class="ferr" id="e-pass">Password must be at least 8 characters.</div>
+            </div>
+
+            <div class="field">
+              <label>Confirm Password</label>
+              <div class="inp-wrap">
+                <i class="fas fa-lock fi"></i>
+                <input type="password" id="rg-confirm" placeholder="Repeat password" oninput="chkMatch()" style="padding-right:44px;">
+                <button type="button" class="pw-eye" onclick="togglePw('rg-confirm','eye-rc')"><i id="eye-rc" class="fa-regular fa-eye"></i></button>
+              </div>
+              <div class="ferr" id="e-confirm">Passwords do not match.</div>
+            </div>
+
+            <div style="font-size:12px;color:#9ca3af;margin-bottom:14px;">
+              By registering, you agree to our <a href="#" style="color:#dc2626;">Terms</a> & <a href="#" style="color:#dc2626;">Privacy Policy</a>.
+            </div>
+
+            <button type="submit" class="btn-red" id="send-otp-btn">
+              <i class="fas fa-envelope-circle-check"></i> Continue with Email Verification
+            </button>
+          </form>
+
+          <div class="toggle-row" style="margin-top:14px;">Already have an account? <button onclick="showLogin()">Sign in</button></div>
+        </div>
+
+        <!-- STEP 2: OTP -->
+        <div id="rg2" style="display:none;">
+          <div class="steps-row">
+            <div class="s-item"><div class="s-circle done" id="sc1"><i class="fas fa-check" style="font-size:11px;"></i></div><div class="s-label done">Details</div></div>
+            <div class="s-line done" id="sl1"></div>
+            <div class="s-item"><div class="s-circle active" id="sc2">2</div><div class="s-label active">Verify</div></div>
+            <div class="s-line" id="sl2"></div>
+            <div class="s-item"><div class="s-circle" id="sc3">3</div><div class="s-label">Done</div></div>
+          </div>
+
+          <div class="auth-hdr" style="margin-bottom:16px;">
+            <h1>Check your email 📬</h1>
+            <p>Enter the 6-digit code we sent you</p>
+          </div>
+
+          <div class="email-badge">
+            <div class="email-badge-icon"><i class="fas fa-envelope"></i></div>
+            <div><div class="email-badge-sub">Code sent to</div><div class="email-badge-addr" id="otp-email-lbl">—</div></div>
+          </div>
+
+          <div class="otp-grid" id="otp-grid">
+            <input class="otp-cell" id="oc0" type="text" maxlength="1" inputmode="numeric" autocomplete="one-time-code">
+            <input class="otp-cell" id="oc1" type="text" maxlength="1" inputmode="numeric">
+            <input class="otp-cell" id="oc2" type="text" maxlength="1" inputmode="numeric">
+            <input class="otp-cell" id="oc3" type="text" maxlength="1" inputmode="numeric">
+            <input class="otp-cell" id="oc4" type="text" maxlength="1" inputmode="numeric">
+            <input class="otp-cell" id="oc5" type="text" maxlength="1" inputmode="numeric">
+          </div>
+          <div class="otp-err" id="otp-err"></div>
+
+          <div class="timer-row">
+            <div class="timer-pill" id="timer-pill"><i class="fas fa-clock"></i><span id="countdown">5:00</span></div>
+            <button class="resend-btn" id="resend-btn" onclick="resendOTP()" disabled>Resend code</button>
+          </div>
+
+          <button class="btn-red" id="verify-btn" onclick="verifyAndRegister()">
+            <i class="fas fa-shield-check"></i> Verify & Create Account
+          </button>
+          <button class="btn-out" onclick="backToForm()"><i class="fas fa-arrow-left"></i> Back to edit details</button>
+        </div>
+
+        <!-- STEP 3: Success -->
+        <div id="rg3" style="display:none;">
+          <div class="steps-row">
+            <div class="s-item"><div class="s-circle done"><i class="fas fa-check" style="font-size:11px;"></i></div><div class="s-label done">Details</div></div>
+            <div class="s-line done"></div>
+            <div class="s-item"><div class="s-circle done"><i class="fas fa-check" style="font-size:11px;"></i></div><div class="s-label done">Verify</div></div>
+            <div class="s-line done"></div>
+            <div class="s-item"><div class="s-circle done"><i class="fas fa-check" style="font-size:11px;"></i></div><div class="s-label done">Done</div></div>
+          </div>
+          <div class="success-wrap">
+            <div class="success-ring">✓</div>
+            <h2>You're all set! 🎉</h2>
+            <p>Your account has been created and email verified. Welcome to Batangas Premium Naga!</p>
+            <div class="redir-pill"><i class="fas fa-circle-notch fa-spin" style="color:#dc2626;"></i> Redirecting in <strong id="redir-secs" style="margin-left:4px;">3</strong>s…</div>
+            <button onclick="goTo('index.html')" class="btn-red"><i class="fas fa-house"></i> Go Now</button>
           </div>
         </div>
-        <div><h4>Quick Links</h4><ul class="footer-links"><li><a href="index.html">Home</a></li><li><a href="menu.html">Menu</a></li><li><a href="about.html">About Us</a></li><li><a href="contact.html">Contact</a></li></ul></div>
-        <div><h4>Customer Service</h4><ul class="footer-links"><li><a href="orders.html">Track Order</a></li></ul></div>
-        <div><h4>Contact Us</h4><p style="margin-bottom:var(--space-2);">Naga City, Camarines Sur</p><p style="margin-bottom:var(--space-2);">+63 XXX XXX XXXX</p><p>info@batangaspremium.com</p></div>
-      </div>
-      <div class="footer-bottom"><p>© 2026 Batangas Premium Naga - Noona's Food Station. All rights reserved.</p></div>
+
+      </div><!-- /#reg-panel -->
+    </div><!-- /.auth-box -->
+  </div>
+</div>
+
+<!-- Forgot Password Modal -->
+<div id="forgot-modal" class="modal-bg" style="display:none;" onclick="if(event.target===this)closeForgot()">
+  <div class="modal-box">
+    <h3>🔑 Reset Password</h3>
+    <p>Enter your email and we'll send a reset link.</p>
+    <div class="field">
+      <label>Email</label>
+      <div class="inp-wrap"><i class="fas fa-envelope fi"></i><input type="email" id="forgot-email" placeholder="you@email.com"></div>
     </div>
-  </footer>
+    <div id="forgot-ok" style="display:none;background:#f0fdf4;border:1px solid #86efac;border-radius:8px;padding:10px;font-size:13px;color:#15803d;margin-top:10px;">
+      <i class="fas fa-circle-check" style="margin-right:6px;"></i>If registered, a reset link has been sent.
+    </div>
+    <div style="display:flex;gap:10px;margin-top:16px;">
+      <button onclick="submitForgot()" class="btn-red" style="flex:1;">Send Link</button>
+      <button onclick="closeForgot()" class="btn-out" style="flex:1;margin-top:0;">Cancel</button>
+    </div>
+  </div>
+</div>
 
-  <script src="js/data.js"></script>
-  <script src="js/api.js"></script>
-  <script src="js/cart.js"></script>
-  <script src="js/app.js"></script>
-  <script>
-  // ── Password toggle
-  function togglePw(id, iconId) {
-    const el = document.getElementById(id), ic = document.getElementById(iconId);
-    if (el.type === 'password') { el.type = 'text'; ic.className = 'fa-regular fa-eye-slash'; }
-    else { el.type = 'password'; ic.className = 'fa-regular fa-eye'; }
+<!-- Toast -->
+<div id="toast"></div>
+
+<script src="js/data.js"></script>
+<script src="js/api.js"></script>
+<script src="js/cart.js"></script>
+<script src="js/app.js"></script>
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+<script>
+const API = 'http://localhost:3000/api';
+let regData = null, otpTimer = null, resendTimeout = null;
+
+// ── Panel switching ──────────────────────────────────────────
+function showLogin() {
+  document.getElementById('login-panel').style.display = 'block';
+  document.getElementById('reg-panel').style.display   = 'none';
+}
+function showReg() {
+  document.getElementById('login-panel').style.display = 'none';
+  document.getElementById('reg-panel').style.display   = 'block';
+  showStep(1);
+}
+function showStep(n) {
+  ['rg1','rg2','rg3'].forEach((id,i) => document.getElementById(id).style.display = i+1===n ? 'block' : 'none');
+}
+function backToForm() {
+  clearInterval(otpTimer); clearTimeout(resendTimeout); clearOTP();
+  showStep(1);
+}
+
+// ── Init ─────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  Cart.updateBadge();
+
+  // Redirect if already logged in
+  if (Auth.isLoggedIn()) {
+    const r = sessionStorage.getItem('redirectAfterLogin') || 'index.html';
+    sessionStorage.removeItem('redirectAfterLogin');
+    goTo(Auth.isAdmin() ? 'admin/dashboard.html' : r); return;
   }
 
-  // ── Password strength (register only)
-  function checkStrength(val) {
-    const bar = document.getElementById('str-bar'), fill = document.getElementById('str-fill'), lbl = document.getElementById('str-label');
-    if (!val) { bar.style.display = 'none'; lbl.className = 'hint'; return; }
-    bar.style.display = 'block'; lbl.className = 'hint show';
-    let s = 0;
-    if (val.length >= 6) s++; if (val.length >= 10) s++;
-    if (/[A-Z]/.test(val)) s++; if (/[0-9]/.test(val)) s++; if (/[^A-Za-z0-9]/.test(val)) s++;
-    const lvls = [
-      { w: '20%', bg: '#ef4444', t: 'Very weak',   c: '#ef4444' },
-      { w: '40%', bg: '#f97316', t: 'Weak',        c: '#f97316' },
-      { w: '60%', bg: '#eab308', t: 'Fair',        c: '#eab308' },
-      { w: '80%', bg: '#22c55e', t: 'Strong',      c: '#22c55e' },
-      { w: '100%',bg: '#16a34a', t: 'Very strong', c: '#16a34a' },
-    ];
-    const l = lvls[Math.min(s - 1, 4)] || lvls[0];
-    fill.style.width = l.w; fill.style.background = l.bg;
-    lbl.textContent = l.t; lbl.style.color = l.c;
-    checkMatch();
+  // Remember me
+  const saved = localStorage.getItem('rememberedEmail');
+  if (saved) { document.getElementById('login-email').value = saved; document.getElementById('remember-me').checked = true; }
+
+  // Login submit
+  document.getElementById('login-form').addEventListener('submit', handleLogin);
+
+  // Register submit
+  document.getElementById('reg-form').addEventListener('submit', handleRegStep1);
+
+  // OTP cells
+  setupOTP();
+});
+
+// ── LOGIN ────────────────────────────────────────────────────
+async function handleLogin(e) {
+  e.preventDefault();
+  const email = document.getElementById('login-email').value.trim();
+  const pass  = document.getElementById('login-pass').value;
+  if (!email || !pass) { toast('Please enter email and password.', 'error'); return; }
+
+  const btn = e.target.querySelector('button[type=submit]');
+  setBtn(btn, true, 'Signing in…');
+
+  if (document.getElementById('remember-me').checked) localStorage.setItem('rememberedEmail', email);
+  else localStorage.removeItem('rememberedEmail');
+
+  const result = await Auth.login(email, pass);
+  if (result.success) {
+    toast('Welcome back! Redirecting…', 'success');
+    const r = sessionStorage.getItem('redirectAfterLogin') || 'index.html';
+    sessionStorage.removeItem('redirectAfterLogin');
+    setTimeout(() => goTo(Auth.isAdmin() ? 'admin/dashboard.html' : r), 800);
+  } else {
+    toast(result.message || 'Invalid credentials.', 'error');
+    setBtn(btn, false, '<i class="fas fa-right-to-bracket"></i> Sign In');
+  }
+}
+
+// ── REGISTER STEP 1 ──────────────────────────────────────────
+async function handleRegStep1(e) {
+  e.preventDefault();
+  let ok = true;
+  const name    = document.getElementById('rg-name').value.trim();
+  const email   = document.getElementById('rg-email').value.trim();
+  const phone   = document.getElementById('rg-phone').value.trim();
+  const pass    = document.getElementById('rg-pass').value;
+  const confirm = document.getElementById('rg-confirm').value;
+
+  // Clear errors
+  ['e-name','e-email','e-pass','e-confirm'].forEach(id => document.getElementById(id).classList.remove('show'));
+
+  if (!name)                                          { showErr('e-name');    ok = false; }
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { showErr('e-email'); ok = false; }
+  if (pass.length < 8)                                { showErr('e-pass');    ok = false; }
+  if (pass !== confirm)                               { showErr('e-confirm'); ok = false; }
+  if (!ok) return;
+
+  const btn = document.getElementById('send-otp-btn');
+  setBtn(btn, true, 'Sending verification code…');
+
+  try {
+    const res  = await fetch(`${API}/otp/send`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email }),
+    });
+    const data = await res.json();
+
+    if (data.success) {
+      regData = { full_name: name, email, phone, password: pass };
+      document.getElementById('otp-email-lbl').textContent = email;
+      showStep(2);
+      clearOTP();
+      startTimer(5 * 60);
+      document.getElementById('oc0').focus();
+      toast('Verification code sent to ' + email + ' 📧', 'success');
+    } else {
+      toast(data.message || 'Failed to send code. Try again.', 'error');
+    }
+  } catch {
+    toast('Cannot connect to server. Is the backend running?', 'error');
   }
 
-  function checkMatch() {
-    const p = document.getElementById('reg-pass').value, c = document.getElementById('confirm-pass').value, h = document.getElementById('match-hint');
-    if (!c) { h.className = 'hint'; return; }
-    h.className = 'hint show';
-    if (p === c) { h.innerHTML = '<span style="color:#16a34a;">✓ Passwords match</span>'; }
-    else { h.innerHTML = '<span style="color:#dc2626;">✕ Passwords do not match</span>'; }
-  }
+  setBtn(btn, false, '<i class="fas fa-envelope-circle-check"></i> Continue with Email Verification');
+}
 
-  // ── Google Sign-In using Google Identity Services
-  function signInWithGoogle() {
-    // Load the Google Sign-In library if not already loaded
-    if (typeof google === 'undefined' || !google.accounts) {
-      Utils.showToast('Google Sign-In is not available. Please configure your Google Client ID.', 'error');
+// ── REGISTER STEP 2 — verify OTP → create account ───────────
+async function verifyAndRegister() {
+  const otp = getOTP();
+  hideErr('otp-err');
+
+  if (otp.length < 6) { showOTPErr('Enter the complete 6-digit code.'); shakeOTP(); return; }
+
+  const btn = document.getElementById('verify-btn');
+  setBtn(btn, true, 'Verifying…');
+
+  try {
+    // A: Verify OTP
+    const vRes  = await fetch(`${API}/otp/verify`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: regData.email, otp }),
+    });
+    const vData = await vRes.json();
+
+    if (!vData.success) {
+      showOTPErr(vData.message || 'Incorrect code. Try again.');
+      shakeOTP();
+      setBtn(btn, false, '<i class="fas fa-shield-check"></i> Verify & Create Account');
       return;
     }
-    google.accounts.id.initialize({
-      // ⚠️ REPLACE 'YOUR_GOOGLE_CLIENT_ID' with your actual Google OAuth 2.0 Client ID
-      // Get it from: https://console.cloud.google.com > APIs & Services > Credentials
-      client_id: 'YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com',
-      callback: handleGoogleResponse,
-      auto_select: false,
-      cancel_on_tap_outside: true,
-    });
-    google.accounts.id.prompt((notification) => {
-      if (notification.isNotDisplayed()) {
-        Utils.showToast('Google Sign-In popup was blocked. Please allow popups.', 'error');
-      }
-    });
-  }
 
-  async function handleGoogleResponse(credentialResponse) {
-    try {
-      // Decode JWT
-      const parts   = credentialResponse.credential.split('.');
-      const payload = JSON.parse(atob(parts[1].replace(/-/g, '+').replace(/_/g, '/')));
-      const { email, name, picture } = payload;
-
-      const res = await fetch('http://localhost:3000/api/auth/google', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, full_name: name, profile_image: picture })
-      }).then(r => r.json());
-
-      if (res.success) {
-        localStorage.setItem('currentUser', JSON.stringify(res.user));
-        Utils.showToast('Signed in with Google!', 'success');
-        const redirect = sessionStorage.getItem('redirectAfterLogin') || 'index.html';
-        sessionStorage.removeItem('redirectAfterLogin');
-        setTimeout(() => goTo(Auth.isAdmin() ? 'admin/dashboard.html' : redirect), 700);
-      } else {
-        Utils.showToast(res.message || 'Google sign-in failed', 'error');
-      }
-    } catch (err) {
-      Utils.showToast('Google sign-in error. Please try again.', 'error');
-      console.error(err);
+    // Flash green
+    for (let i = 0; i < 6; i++) {
+      const c = document.getElementById('oc'+i);
+      c.className = 'otp-cell ok';
     }
-  }
 
-  // ── Forgot password modal
-  function openForgot()  { document.getElementById('forgot-modal').style.display = 'block'; document.getElementById('forgot-ok').style.display = 'none'; }
-  function closeForgot() { document.getElementById('forgot-modal').style.display = 'none'; }
-  function submitForgot() {
-    const email = document.getElementById('forgot-email').value.trim();
-    if (!email) { Utils.showToast('Please enter your email', 'error'); return; }
-    // Show success (real implementation would call backend)
-    document.getElementById('forgot-ok').style.display = 'block';
-    setTimeout(closeForgot, 3000);
-  }
+    // B: Register account
+    const rRes  = await fetch(`${API}/auth/register`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ...regData, skip_otp_check: true }),
+    });
+    const rData = await rRes.json();
 
-  // ── Remember Me restore
-  document.addEventListener('DOMContentLoaded', () => {
-    const remembered = localStorage.getItem('rememberedEmail');
-    if (remembered) {
-      const em = document.getElementById('login-email');
-      if (em) em.value = remembered;
-      document.getElementById('remember-me').checked = true;
+    if (rData.success) {
+      localStorage.setItem('currentUser', JSON.stringify(rData.user));
+      clearInterval(otpTimer); clearTimeout(resendTimeout);
+      await delay(500);
+      showStep(3);
+      toast('Account created! Welcome 🎉', 'success');
+      startRedirect(3);
+    } else {
+      showOTPErr(rData.message || 'Registration failed. Please try again.');
     }
-  });
+  } catch {
+    showOTPErr('Server error. Is the backend running?');
+  }
 
-  // Override login form (need remember me logic)
-  document.addEventListener('DOMContentLoaded', () => {
-    document.getElementById('login-form').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const btn = e.target.querySelector('button[type=submit]');
-      btn.innerHTML = '<i class="fas fa-spinner fa-spin" style="margin-right:8px;"></i>Signing in...';
-      btn.disabled = true;
-      const d = new FormData(e.target);
-      const email = d.get('email'), password = d.get('password');
+  setBtn(btn, false, '<i class="fas fa-shield-check"></i> Verify & Create Account');
+}
 
-      if (document.getElementById('remember-me').checked) localStorage.setItem('rememberedEmail', email);
-      else localStorage.removeItem('rememberedEmail');
+// ── Resend OTP ───────────────────────────────────────────────
+async function resendOTP() {
+  if (!regData) return;
+  const btn = document.getElementById('resend-btn');
+  btn.disabled = true; btn.textContent = 'Sending…';
+  clearOTP(); hideErr('otp-err');
 
-      const result = await Auth.login(email, password);
-      if (result.success) {
-        Utils.showToast('Login successful!', 'success');
-        const redirect = sessionStorage.getItem('redirectAfterLogin') || 'index.html';
-        sessionStorage.removeItem('redirectAfterLogin');
-        setTimeout(() => goTo(Auth.isAdmin() ? 'admin/dashboard.html' : redirect), 700);
-      } else {
-        Utils.showToast(result.message || 'Login failed', 'error');
-        btn.innerHTML = '<i class="fas fa-sign-in-alt" style="margin-right:8px;"></i>Sign In';
-        btn.disabled = false;
+  try {
+    const res  = await fetch(`${API}/otp/send`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: regData.email }),
+    });
+    const data = await res.json();
+    if (data.success) {
+      clearInterval(otpTimer); clearTimeout(resendTimeout);
+      startTimer(5 * 60);
+      document.getElementById('oc0').focus();
+      toast('New code sent! Check your email 📧', 'info');
+    } else { toast(data.message || 'Failed to resend.', 'error'); }
+  } catch { toast('Server error.', 'error'); }
+
+  btn.textContent = 'Resend code';
+}
+
+// ── Timer ─────────────────────────────────────────────────────
+function startTimer(secs) {
+  const pill  = document.getElementById('timer-pill');
+  const cdEl  = document.getElementById('countdown');
+  const resBtn= document.getElementById('resend-btn');
+  resBtn.disabled = true;
+  pill.className  = 'timer-pill';
+  let rem = secs;
+
+  otpTimer = setInterval(() => {
+    const m = Math.floor(rem/60), s = rem%60;
+    cdEl.textContent = `${m}:${String(s).padStart(2,'0')}`;
+    rem--;
+    if (rem < 0) {
+      clearInterval(otpTimer);
+      cdEl.textContent = 'Expired';
+      pill.className = 'timer-pill exp';
+      resBtn.disabled = false;
+      toast('Code expired. Please resend.', 'error');
+    }
+  }, 1000);
+
+  resendTimeout = setTimeout(() => { resBtn.disabled = false; }, 30000);
+}
+
+// ── Redirect countdown ────────────────────────────────────────
+function startRedirect(secs) {
+  let c = secs;
+  const el = document.getElementById('redir-secs');
+  if (el) el.textContent = c;
+  const t = setInterval(() => {
+    c--;
+    if (el) el.textContent = c;
+    if (c <= 0) { clearInterval(t); goTo('index.html'); }
+  }, 1000);
+}
+
+// ── OTP cells ─────────────────────────────────────────────────
+function setupOTP() {
+  for (let i = 0; i < 6; i++) {
+    const el = document.getElementById('oc'+i);
+    if (!el) continue;
+    el.addEventListener('input', () => {
+      el.value = el.value.replace(/\D/g,'').slice(-1);
+      el.classList.toggle('filled', !!el.value);
+      el.classList.remove('shaking');
+      if (el.value && i < 5) document.getElementById('oc'+(i+1)).focus();
+      if (getOTP().length === 6) verifyAndRegister();
+    });
+    el.addEventListener('keydown', e => {
+      if (e.key==='Backspace' && !el.value && i>0) {
+        const p=document.getElementById('oc'+(i-1)); p.value=''; p.classList.remove('filled'); p.focus();
       }
+      if (e.key==='Enter') verifyAndRegister();
     });
-
-    document.getElementById('register-form').addEventListener('submit', async (e) => {
+    el.addEventListener('paste', e => {
       e.preventDefault();
-      const d = new FormData(e.target);
-      const pass = d.get('password'), confirm = d.get('confirmPassword');
-      if (pass !== confirm) { Utils.showToast('Passwords do not match', 'error'); return; }
-      if (pass.length < 6) { Utils.showToast('Password must be at least 6 characters', 'error'); return; }
-      const btn = e.target.querySelector('button[type=submit]');
-      btn.innerHTML = '<i class="fas fa-spinner fa-spin" style="margin-right:8px;"></i>Creating...';
-      btn.disabled = true;
-      const result = await Auth.register({ full_name: d.get('fullName'), email: d.get('email'), phone: d.get('phone'), password: pass });
-      if (result.success) { Utils.showToast('Account created!', 'success'); setTimeout(() => goTo('index.html'), 700); }
-      else { Utils.showToast(result.message || 'Registration failed', 'error'); btn.innerHTML = '<i class="fas fa-user-plus" style="margin-right:8px;"></i>Create Account'; btn.disabled = false; }
+      const digits=(e.clipboardData.getData('text')||'').replace(/\D/g,'').slice(0,6);
+      digits.split('').forEach((d,j)=>{
+        const b=document.getElementById('oc'+j);
+        if(b){b.value=d;b.classList.add('filled');b.classList.remove('shaking');}
+      });
+      const last=document.getElementById('oc'+(digits.length-1));
+      if(last) last.focus();
+      if(digits.length===6) setTimeout(verifyAndRegister, 100);
     });
-  });
-  </script>
+  }
+}
+function getOTP()   { return [0,1,2,3,4,5].map(i=>document.getElementById('oc'+i)?.value||'').join(''); }
+function clearOTP() { for(let i=0;i<6;i++){const c=document.getElementById('oc'+i);if(c){c.value='';c.className='otp-cell';}}}
+function shakeOTP() { for(let i=0;i<6;i++){const c=document.getElementById('oc'+i);if(c)c.classList.add('shaking');} setTimeout(()=>{for(let i=0;i<6;i++){const c=document.getElementById('oc'+i);if(c)c.classList.remove('shaking');}},500); }
+function showOTPErr(msg){ const el=document.getElementById('otp-err');if(el){el.textContent=msg;el.classList.add('show');}}
+function hideErr(id)    { const el=document.getElementById(id);if(el){el.textContent='';el.classList.remove('show');}}
+function showErr(id)    { const el=document.getElementById(id);if(el)el.classList.add('show'); }
 
-  <!-- Load Google Identity Services script -->
-  <script src="https://accounts.google.com/gsi/client" async defer></script>
+// ── Password strength ─────────────────────────────────────────
+function updStr(val) {
+  const segs=document.getElementById('str-segs'),lbl=document.getElementById('str-lbl');
+  if(!val){segs.style.display='none';lbl.style.display='none';return;}
+  segs.style.display='flex';lbl.style.display='block';
+  let s=0;
+  if(val.length>=8)s++;if(val.length>=12)s++;if(/[A-Z]/.test(val))s++;if(/[0-9]/.test(val)&&/[^A-Za-z0-9]/.test(val))s++;
+  const cols=['#ef4444','#f97316','#eab308','#22c55e'];
+  const lbls=['Weak','Fair','Good','Strong'];
+  for(let i=0;i<4;i++) document.getElementById('ss'+i).style.background=i<s?cols[Math.min(s-1,3)]:'#e5e7eb';
+  lbl.textContent=lbls[Math.min(s-1,3)]||'Too short';lbl.style.color=cols[Math.min(s-1,3)]||'#ef4444';
+}
+function chkMatch(){
+  const p=document.getElementById('rg-pass').value,c=document.getElementById('rg-confirm').value;
+  const el=document.getElementById('e-confirm');
+  if(!c){el.classList.remove('show');return;}
+  if(p!==c)el.classList.add('show'); else el.classList.remove('show');
+}
+
+// ── Helpers ───────────────────────────────────────────────────
+function togglePw(id,iconId){const el=document.getElementById(id),ic=document.getElementById(iconId);el.type=el.type==='password'?'text':'password';ic.className=el.type==='text'?'fa-regular fa-eye-slash':'fa-regular fa-eye';}
+function setBtn(btn,loading,html){btn.disabled=loading;btn.innerHTML=loading?`<i class="fas fa-circle-notch fa-spin"></i> ${html||'Loading…'}`:html;}
+function delay(ms){return new Promise(r=>setTimeout(r,ms));}
+
+function toast(msg, type='success') {
+  const el=document.getElementById('toast');
+  const cfg={success:{bg:'#f0fdf4',border:'#86efac',color:'#15803d',icon:'✓'},error:{bg:'#fff1f2',border:'#fca5a5',color:'#be123c',icon:'✕'},info:{bg:'#eff6ff',border:'#bfdbfe',color:'#1d4ed8',icon:'ℹ'}};
+  const c=cfg[type]||cfg.success;
+  el.style.cssText=`position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(0);z-index:99999;min-width:260px;max-width:380px;padding:13px 18px;border-radius:12px;font-size:14px;font-weight:500;display:flex;align-items:center;gap:10px;box-shadow:0 8px 24px rgba(0,0,0,.12);background:${c.bg};border:1.5px solid ${c.border};color:${c.color};opacity:1;transition:all .3s ease;`;
+  el.innerHTML=`<span style="width:22px;height:22px;border-radius:50%;background:${c.border};color:white;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;">${c.icon}</span><span>${msg}</span>`;
+  clearTimeout(el._t);
+  el._t=setTimeout(()=>{el.style.opacity='0';el.style.transform='translateX(-50%) translateY(20px)';},3500);
+}
+
+// Forgot password
+function openForgot(){document.getElementById('forgot-modal').style.display='flex';document.getElementById('forgot-ok').style.display='none';}
+function closeForgot(){document.getElementById('forgot-modal').style.display='none';}
+function submitForgot(){const email=document.getElementById('forgot-email').value.trim();if(!email){toast('Enter your email','error');return;}document.getElementById('forgot-ok').style.display='block';setTimeout(closeForgot,3000);}
+
+// Google Sign-In
+function signInWithGoogle(){if(typeof google==='undefined'||!google.accounts){toast('Google Sign-In: Set your Client ID first.','info');return;}google.accounts.id.initialize({client_id:'YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com',callback:handleGoogleResponse});google.accounts.id.prompt();}
+async function handleGoogleResponse(cr){try{const p=JSON.parse(atob(cr.credential.split('.')[1].replace(/-/g,'+').replace(/_/g,'/')));const res=await fetch(`${API}/auth/google`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:p.email,full_name:p.name})}).then(r=>r.json());if(res.success){localStorage.setItem('currentUser',JSON.stringify(res.user));toast('Signed in with Google!','success');setTimeout(()=>goTo(Auth.isAdmin()?'admin/dashboard.html':'index.html'),800);}else{toast(res.message||'Failed','error');}}catch{toast('Google sign-in error','error');}}
+</script>
 </body>
 </html>
