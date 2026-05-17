@@ -28,7 +28,11 @@ router.post('/login', async (req, res) => {
        FROM users
        WHERE LOWER(email) = LOWER(:email) AND password = :password`,
       { email, password },
-      { outFormat: oracledb.OUT_FORMAT_OBJECT }
+      {
+        outFormat: oracledb.OUT_FORMAT_OBJECT,
+        // ✅ CLOB fix: fetch profile_image as plain string, not a stream
+        fetchInfo: { profile_image: { type: oracledb.STRING } }
+      }
     );
     if (!result.rows.length)
       return res.status(401).json({ success: false, message: 'Invalid email or password.' });
@@ -64,7 +68,6 @@ router.post('/register', async (req, res) => {
   try {
     conn = await getConnection();
 
-    // Check OTP verified (unless skipped by admin adding user)
     if (!skip_otp_check) {
       const otpCheck = await conn.execute(
         `SELECT id FROM (
@@ -85,7 +88,6 @@ router.post('/register', async (req, res) => {
       }
     }
 
-    // Check if email already registered
     const check = await conn.execute(
       `SELECT user_id FROM users WHERE LOWER(email) = LOWER(:email)`,
       { email }, { outFormat: oracledb.OUT_FORMAT_OBJECT }
@@ -93,7 +95,6 @@ router.post('/register', async (req, res) => {
     if (check.rows.length > 0)
       return res.status(409).json({ success: false, message: 'Email already registered. Please sign in.' });
 
-    // Insert new user
     const userRole = role || 'customer';
     const insert = await conn.execute(
       `INSERT INTO users (full_name, email, phone, password, role, status, is_super_admin)
@@ -142,7 +143,11 @@ router.post('/google', async (req, res) => {
               NVL(is_super_admin,0)    AS "is_super_admin",
               profile_image            AS "profile_image"
        FROM users WHERE LOWER(email) = LOWER(:email)`,
-      { email }, { outFormat: oracledb.OUT_FORMAT_OBJECT }
+      { email },
+      {
+        outFormat: oracledb.OUT_FORMAT_OBJECT,
+        fetchInfo: { profile_image: { type: oracledb.STRING } }
+      }
     );
     if (check.rows.length > 0) {
       const user = check.rows[0];
@@ -169,26 +174,50 @@ router.post('/google', async (req, res) => {
 
 
 // ── PUT /api/auth/profile/:userId ────────────────────────────
+// FIX: Oracle CLOB columns CANNOT be bound as plain strings for
+//      large values (base64 images). Must use { val, type: oracledb.CLOB }.
+//      Without this, Oracle silently saves NULL or throws ORA-01704.
 router.put('/profile/:userId', async (req, res) => {
   const { full_name, phone, password, profile_image } = req.body;
+  const id = parseInt(req.params.userId);
+
   let conn;
   try {
     conn = await getConnection();
-    let sql, binds;
+
     if (password && profile_image) {
-      sql   = `UPDATE users SET full_name=:full_name, phone=:phone, password=:password, profile_image=:profile_image WHERE user_id=:id`;
-      binds = { full_name, phone: phone||null, password, profile_image, id: parseInt(req.params.userId) };
+      await conn.execute(
+        `UPDATE users SET full_name=:full_name, phone=:phone, password=:password, profile_image=:profile_image WHERE user_id=:id`,
+        {
+          full_name,
+          phone: phone || null,
+          password,
+          profile_image: { val: profile_image, type: oracledb.CLOB },
+          id
+        }
+      );
     } else if (password) {
-      sql   = `UPDATE users SET full_name=:full_name, phone=:phone, password=:password WHERE user_id=:id`;
-      binds = { full_name, phone: phone||null, password, id: parseInt(req.params.userId) };
+      await conn.execute(
+        `UPDATE users SET full_name=:full_name, phone=:phone, password=:password WHERE user_id=:id`,
+        { full_name, phone: phone || null, password, id }
+      );
     } else if (profile_image) {
-      sql   = `UPDATE users SET full_name=:full_name, phone=:phone, profile_image=:profile_image WHERE user_id=:id`;
-      binds = { full_name, phone: phone||null, profile_image, id: parseInt(req.params.userId) };
+      await conn.execute(
+        `UPDATE users SET full_name=:full_name, phone=:phone, profile_image=:profile_image WHERE user_id=:id`,
+        {
+          full_name,
+          phone: phone || null,
+          profile_image: { val: profile_image, type: oracledb.CLOB },
+          id
+        }
+      );
     } else {
-      sql   = `UPDATE users SET full_name=:full_name, phone=:phone WHERE user_id=:id`;
-      binds = { full_name, phone: phone||null, id: parseInt(req.params.userId) };
+      await conn.execute(
+        `UPDATE users SET full_name=:full_name, phone=:phone WHERE user_id=:id`,
+        { full_name, phone: phone || null, id }
+      );
     }
-    await conn.execute(sql, binds);
+
     await conn.commit();
     res.json({ success: true });
   } catch (err) {
