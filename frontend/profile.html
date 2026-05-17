@@ -7,32 +7,8 @@
   <link rel="stylesheet" href="css/style.css">
   <script src="https://kit.fontawesome.com/2771f4216a.js" crossorigin="anonymous"></script>
   <style>
-    .profile-avatar-wrap { position:relative;width:100px;height:100px;margin:0 auto 16px;cursor:pointer; }
-    .profile-avatar {
-      width:100px;height:100px;border-radius:50%;
-      background:linear-gradient(135deg,#dc2626,#f97316);
-      display:flex;align-items:center;justify-content:center;
-      font-size:2.5rem;font-weight:700;color:white;overflow:hidden;
-      border:4px solid white;box-shadow:0 4px 16px rgba(220,38,38,.3);
-    }
-    .profile-avatar img { width:100%;height:100%;object-fit:cover;border-radius:50%; }
-    .avatar-edit-btn {
-      position:absolute;bottom:2px;right:2px;
-      width:28px;height:28px;border-radius:50%;
-      background:#dc2626;border:2px solid white;
-      color:white;font-size:11px;cursor:pointer;
-      display:flex;align-items:center;justify-content:center;
-    }
-    .avatar-upload-input { display:none; }
-
-    .password-wrapper { position:relative; }
-    .password-wrapper .form-input { padding-right:48px; }
-    .password-toggle { position:absolute;right:14px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--gray-400);font-size:16px;padding:0;display:flex;align-items:center;z-index:2;transition:color .2s; }
-    .password-toggle:hover { color:var(--gray-700); }
-    .section-divider { border:none;border-top:1px solid var(--gray-200);margin:24px 0; }
-
-    /* Notification bell */
-    .notif-bell { position:relative; cursor:pointer; display:flex; align-items:center; }
+    /* ── Notification ── */
+    .notif-bell  { position:relative; cursor:pointer; display:flex; align-items:center; }
     .notif-count {
       position:absolute; top:-6px; right:-6px;
       background:#dc2626; color:white; font-size:10px; font-weight:700;
@@ -50,27 +26,169 @@
     .notif-item.unread { background:#fff7f7; }
     .notif-empty  { padding:32px; text-align:center; color:#9ca3af; font-size:13px; }
 
-    .stat-pill { display:inline-flex;align-items:center;gap:6px;background:var(--gray-50);border:1px solid var(--gray-200);border-radius:999px;padding:6px 14px;font-size:13px;font-weight:500;color:var(--gray-700); }
+    /* ── Profile layout ── */
+    .profile-wrap {
+      max-width: 860px; margin: 0 auto;
+      display: grid; grid-template-columns: 280px 1fr; gap: 24px;
+      padding: var(--space-8) var(--space-4);
+    }
+    @media (max-width: 700px) {
+      .profile-wrap { grid-template-columns: 1fr; }
+    }
+
+    /* ── Left sidebar card ── */
+    .profile-sidebar {
+      background: white; border-radius: 20px;
+      box-shadow: 0 4px 20px rgba(0,0,0,.07);
+      padding: 28px 20px; text-align: center;
+      height: fit-content; position: sticky; top: 20px;
+    }
+    .profile-avatar-wrap { position:relative; width:110px; height:110px; margin:0 auto 16px; cursor:pointer; }
+    .profile-avatar {
+      width:110px; height:110px; border-radius:50%;
+      background:linear-gradient(135deg,#dc2626,#f97316);
+      display:flex; align-items:center; justify-content:center;
+      font-size:2.8rem; font-weight:800; color:white; overflow:hidden;
+      border:4px solid white; box-shadow:0 4px 20px rgba(220,38,38,.3);
+      transition: transform .2s;
+    }
+    .profile-avatar:hover { transform: scale(1.04); }
+    .profile-avatar img { width:100%; height:100%; object-fit:cover; border-radius:50%; }
+    .avatar-edit-btn {
+      position:absolute; bottom:4px; right:4px;
+      width:30px; height:30px; border-radius:50%;
+      background:#dc2626; border:3px solid white;
+      color:white; font-size:11px; cursor:pointer;
+      display:flex; align-items:center; justify-content:center;
+      box-shadow:0 2px 8px rgba(220,38,38,.4);
+    }
+    .avatar-upload-input { display:none; }
+    .profile-name  { font-size:1.15rem; font-weight:800; color:#111; margin-bottom:4px; }
+    .profile-email { font-size:13px; color:#9ca3af; margin-bottom:4px; }
+    .profile-role  {
+      display:inline-flex; align-items:center; gap:5px;
+      background:#fef2f2; color:#dc2626; border:1px solid #fca5a5;
+      border-radius:999px; padding:3px 12px; font-size:12px; font-weight:600; margin-bottom:20px;
+    }
+    .profile-role.admin-role { background:#dbeafe; color:#1d4ed8; border-color:#bfdbfe; }
+
+    /* Stats in sidebar */
+    .sidebar-stats { display:flex; flex-direction:column; gap:10px; margin-bottom:20px; }
+    .sidebar-stat {
+      display:flex; align-items:center; justify-content:space-between;
+      background:#f9fafb; border-radius:10px; padding:10px 14px;
+      font-size:13px;
+    }
+    .sidebar-stat-label { color:#6b7280; display:flex; align-items:center; gap:6px; }
+    .sidebar-stat-val   { font-weight:700; color:#111; }
+
+    /* Sidebar nav */
+    .sidebar-nav { display:flex; flex-direction:column; gap:4px; }
+    .sidebar-nav-item {
+      display:flex; align-items:center; gap:10px;
+      padding:10px 14px; border-radius:10px;
+      font-size:14px; font-weight:500; color:#6b7280;
+      cursor:pointer; transition:all .15s; text-decoration:none;
+      border:none; background:none; width:100%; text-align:left;
+    }
+    .sidebar-nav-item:hover { background:#f3f4f6; color:#111; }
+    .sidebar-nav-item.active { background:#fef2f2; color:#dc2626; font-weight:700; }
+    .sidebar-nav-item.danger { color:#dc2626; }
+    .sidebar-nav-item.danger:hover { background:#fee2e2; }
+
+    /* ── Main content ── */
+    .profile-main { display:flex; flex-direction:column; gap:20px; }
+
+    .profile-section {
+      background:white; border-radius:20px;
+      box-shadow:0 4px 20px rgba(0,0,0,.07); padding:28px;
+    }
+    .section-title {
+      font-size:1rem; font-weight:700; color:#111;
+      display:flex; align-items:center; gap:8px; margin-bottom:20px;
+      padding-bottom:14px; border-bottom:1px solid #f3f4f6;
+    }
+    .section-title-icon {
+      width:32px; height:32px; border-radius:8px;
+      background:#fef2f2; color:#dc2626;
+      display:flex; align-items:center; justify-content:center; font-size:13px;
+    }
+
+    /* Form fields */
+    .field-row { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+    @media(max-width:500px){ .field-row { grid-template-columns:1fr; } }
+    .form-field { margin-bottom:16px; }
+    .form-field label { display:block; font-size:13px; font-weight:600; color:#374151; margin-bottom:5px; }
+    .form-field .fi-wrap { position:relative; }
+    .form-field .fi { position:absolute; left:13px; top:50%; transform:translateY(-50%); color:#9ca3af; font-size:14px; pointer-events:none; }
+    .form-field input { width:100%; padding:11px 12px 11px 38px; border:1.5px solid #e5e7eb; border-radius:10px; font-size:14px; color:#111; background:#fafafa; outline:none; transition:all .2s; font-family:inherit; }
+    .form-field input:focus { border-color:#dc2626; background:white; box-shadow:0 0 0 3px rgba(220,38,38,.08); }
+    .form-field input[readonly] { background:#f9fafb; color:#9ca3af; cursor:not-allowed; }
+    .pw-wrap { position:relative; }
+    .pw-wrap input { padding-right:44px; }
+    .pw-toggle { position:absolute; right:13px; top:50%; transform:translateY(-50%); background:none; border:none; cursor:pointer; color:#9ca3af; font-size:15px; }
+    .pw-toggle:hover { color:#6b7280; }
+
+    /* Order history cards */
+    .order-card {
+      border:1px solid #f3f4f6; border-radius:12px; padding:14px;
+      display:flex; align-items:center; justify-content:space-between; gap:12px;
+      transition:border-color .15s;
+    }
+    .order-card:hover { border-color:#fca5a5; }
+    .order-id   { font-weight:700; color:#dc2626; font-size:14px; }
+    .order-date { font-size:12px; color:#9ca3af; margin-top:2px; }
+    .order-items-preview { font-size:12px; color:#6b7280; margin-top:4px; }
+
+    /* Status badges */
+    .status-badge {
+      padding:3px 10px; border-radius:999px; font-size:12px; font-weight:600; white-space:nowrap;
+    }
+    .st-pending   { background:#fef3c7; color:#92400e; }
+    .st-confirmed { background:#dbeafe; color:#1e40af; }
+    .st-preparing { background:#ede9fe; color:#5b21b6; }
+    .st-ready     { background:#d1fae5; color:#065f46; }
+    .st-delivered { background:#dcfce7; color:#14532d; }
+    .st-cancelled { background:#fee2e2; color:#7f1d1d; }
+
+    /* Danger zone */
+    .danger-zone { border:1px solid #fca5a5; border-radius:16px; padding:20px; background:#fff5f5; }
+    .danger-title { font-size:.9rem; font-weight:700; color:#dc2626; margin-bottom:6px; }
+    .danger-desc  { font-size:13px; color:#6b7280; margin-bottom:14px; }
+
+    /* Tabs */
+    .tabs { display:flex; gap:4px; margin-bottom:20px; background:#f3f4f6; border-radius:10px; padding:4px; }
+    .tab {
+      flex:1; padding:8px; text-align:center; font-size:13px; font-weight:600;
+      border-radius:7px; cursor:pointer; color:#6b7280; transition:all .15s; border:none; background:none;
+    }
+    .tab.active { background:white; color:#dc2626; box-shadow:0 1px 4px rgba(0,0,0,.08); }
+
+    @keyframes fadeIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+    .anim { animation:fadeIn .25s ease both; }
   </style>
 </head>
 <body>
+
   <header class="header">
     <div class="container header-content">
       <a href="index.html" class="logo">
         <div class="logo-icon"><i class="fas fa-utensils"></i></div>
-        <div><div class="logo-text">Batangas Premium Naga</div><div class="logo-subtext">Noona's Food Station</div></div>
+        <div>
+          <div class="logo-text">Batangas Premium Naga</div>
+          <div class="logo-subtext">Noona's Food Station</div>
+        </div>
       </a>
       <nav class="nav">
-        <a href="index.html" class="nav-link">Home</a>
-        <a href="menu.html"  class="nav-link">Menu</a>
-        <a href="about.html" class="nav-link">About</a>
+        <a href="index.html"   class="nav-link">Home</a>
+        <a href="menu.html"    class="nav-link">Menu</a>
+        <a href="about.html"   class="nav-link">About</a>
         <a href="contact.html" class="nav-link">Contact</a>
-        <!-- Notification bell -->
         <div class="notif-bell nav-link" id="notif-bell" onclick="toggleNotifications()">
           <i class="fas fa-bell" style="font-size:18px;"></i>
           <span class="notif-count" id="notif-count">0</span>
         </div>
-        <a href="login.html" class="nav-link">
+        <a href="profile.html" class="nav-link" id="user-nav-link">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
           </svg>
@@ -92,89 +210,186 @@
       <span style="font-size:14px;font-weight:600;">Notifications</span>
       <button onclick="markAllRead()" style="background:none;border:none;font-size:12px;color:#dc2626;cursor:pointer;font-weight:500;">Mark all read</button>
     </div>
-    <div id="notif-list"><div class="notif-empty"><i class="fas fa-bell-slash" style="font-size:24px;margin-bottom:8px;display:block;"></i>No notifications</div></div>
+    <div id="notif-list">
+      <div class="notif-empty"><i class="fas fa-bell-slash" style="font-size:24px;margin-bottom:8px;display:block;"></i>No notifications</div>
+    </div>
   </div>
 
-  <section class="hero">
+  <section class="hero" style="padding:var(--space-8) 0;">
     <div class="container">
-      <h1>My Profile</h1>
-      <p>Manage your account information</p>
+      <h1>My Account</h1>
+      <p>Manage your profile, orders and settings</p>
     </div>
   </section>
 
-  <main style="padding:var(--space-8) 0;min-height:60vh;">
-    <div class="container" style="max-width:600px;">
+  <main style="min-height:60vh;background:var(--gray-50);padding-bottom:40px;">
+    <div class="profile-wrap">
 
-      <!-- Quick stats -->
-      <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:24px;" id="profile-stats"></div>
+      <!-- ── LEFT SIDEBAR ── -->
+      <aside class="profile-sidebar anim">
+        <!-- Avatar -->
+        <div class="profile-avatar-wrap" onclick="document.getElementById('avatar-upload').click()" title="Change photo">
+          <div class="profile-avatar" id="profile-avatar">?</div>
+          <div class="avatar-edit-btn"><i class="fas fa-camera"></i></div>
+        </div>
+        <input type="file" id="avatar-upload" class="avatar-upload-input" accept="image/*" onchange="handleAvatarChange(event)">
+        <p style="font-size:11px;color:#9ca3af;margin-bottom:12px;">Click to change photo</p>
 
-      <div class="card">
-        <div class="card-content" style="padding:var(--space-8);">
+        <div class="profile-name"  id="sidebar-name">—</div>
+        <div class="profile-email" id="sidebar-email">—</div>
+        <div class="profile-role"  id="sidebar-role"><i class="fas fa-user"></i> Customer</div>
 
-          <!-- Avatar -->
-          <div style="text-align:center;margin-bottom:28px;">
-            <div class="profile-avatar-wrap" onclick="document.getElementById('avatar-upload').click()">
-              <div class="profile-avatar" id="profile-avatar">?</div>
-              <div class="avatar-edit-btn"><i class="fas fa-camera"></i></div>
-            </div>
-            <input type="file" id="avatar-upload" class="avatar-upload-input" accept="image/*" onchange="handleAvatarChange(event)">
-            <p style="font-size:12px;color:var(--gray-400);margin-top:4px;">Click avatar to change photo</p>
+        <!-- Stats -->
+        <div class="sidebar-stats">
+          <div class="sidebar-stat">
+            <span class="sidebar-stat-label"><i class="fas fa-bag-shopping" style="color:#dc2626;"></i> Total Orders</span>
+            <span class="sidebar-stat-val" id="stat-total">0</span>
           </div>
+          <div class="sidebar-stat">
+            <span class="sidebar-stat-label"><i class="fas fa-clock" style="color:#f97316;"></i> Pending</span>
+            <span class="sidebar-stat-val" id="stat-pending">0</span>
+          </div>
+          <div class="sidebar-stat">
+            <span class="sidebar-stat-label"><i class="fas fa-circle-check" style="color:#16a34a;"></i> Delivered</span>
+            <span class="sidebar-stat-val" id="stat-delivered">0</span>
+          </div>
+          <div class="sidebar-stat">
+            <span class="sidebar-stat-label"><i class="fas fa-peso-sign" style="color:#dc2626;"></i> Total Spent</span>
+            <span class="sidebar-stat-val" id="stat-spent">₱0</span>
+          </div>
+        </div>
 
+        <!-- Nav -->
+        <div class="sidebar-nav">
+          <button class="sidebar-nav-item active" id="tab-info-btn" onclick="switchTab('info')">
+            <i class="fas fa-user"></i> Personal Info
+          </button>
+          <button class="sidebar-nav-item" id="tab-orders-btn" onclick="switchTab('orders')">
+            <i class="fas fa-list-check"></i> My Orders
+          </button>
+          <button class="sidebar-nav-item" id="tab-pass-btn" onclick="switchTab('pass')">
+            <i class="fas fa-lock"></i> Change Password
+          </button>
+          <hr style="border:none;border-top:1px solid #f3f4f6;margin:8px 0;">
+          <button class="sidebar-nav-item danger" onclick="Auth.logout()">
+            <i class="fas fa-sign-out-alt"></i> Sign Out
+          </button>
+        </div>
+      </aside>
+
+      <!-- ── MAIN CONTENT ── -->
+      <div class="profile-main">
+
+        <!-- Personal Info Tab -->
+        <div class="profile-section anim" id="tab-info" style="animation-delay:.05s;">
+          <div class="section-title">
+            <div class="section-title-icon"><i class="fas fa-user"></i></div>
+            Personal Information
+          </div>
           <form id="profile-form">
-            <h3 style="font-size:1rem;font-weight:600;margin-bottom:16px;color:var(--gray-700);">
-              <i class="fas fa-user" style="margin-right:8px;color:#dc2626;"></i>Personal Information
-            </h3>
-
-            <div class="form-group">
-              <label class="form-label">Name *</label>
-              <input type="text" name="fullName" class="form-input" required placeholder="Juan dela Cruz">
-            </div>
-            <div class="form-group">
-              <label class="form-label">Email Address</label>
-              <input type="email" name="email" class="form-input" readonly
-                style="background:var(--gray-100);color:var(--gray-500);cursor:not-allowed;">
-              <p style="font-size:12px;color:var(--gray-400);margin-top:4px;">Email cannot be changed</p>
-            </div>
-            <div class="form-group">
-              <label class="form-label">Phone Number</label>
-              <input type="tel" name="phone" class="form-input" placeholder="+63 9XX XXX XXXX">
-            </div>
-
-            <hr class="section-divider">
-
-            <h3 style="font-size:1rem;font-weight:600;margin-bottom:4px;color:var(--gray-700);">
-              <i class="fas fa-lock" style="margin-right:8px;color:#dc2626;"></i>Change Password
-            </h3>
-            <p style="font-size:13px;color:var(--gray-500);margin-bottom:16px;">Leave blank to keep current password</p>
-
-            <div class="form-group">
-              <label class="form-label">New Password</label>
-              <div class="password-wrapper">
-                <input type="password" name="newPassword" id="new-pass" class="form-input" placeholder="Min. 6 characters">
-                <button type="button" class="password-toggle" onclick="togglePw('new-pass','eye1')"><i id="eye1" class="fa-regular fa-eye"></i></button>
+            <div class="field-row">
+              <div class="form-field">
+                <label>Full Name *</label>
+                <div class="fi-wrap">
+                  <i class="fas fa-user fi"></i>
+                  <input type="text" name="fullName" placeholder="Juan dela Cruz" required>
+                </div>
+              </div>
+              <div class="form-field">
+                <label>Phone Number</label>
+                <div class="fi-wrap">
+                  <i class="fas fa-phone fi"></i>
+                  <input type="tel" name="phone" placeholder="+63 9XX XXX XXXX">
+                </div>
               </div>
             </div>
-            <div class="form-group">
-              <label class="form-label">Confirm New Password</label>
-              <div class="password-wrapper">
-                <input type="password" name="confirmPassword" id="confirm-pass" class="form-input" placeholder="Repeat new password">
-                <button type="button" class="password-toggle" onclick="togglePw('confirm-pass','eye2')"><i id="eye2" class="fa-regular fa-eye"></i></button>
+            <div class="form-field">
+              <label>Email Address</label>
+              <div class="fi-wrap">
+                <i class="fas fa-envelope fi"></i>
+                <input type="email" name="email" readonly>
               </div>
+              <p style="font-size:12px;color:#9ca3af;margin-top:4px;"><i class="fas fa-lock" style="font-size:10px;margin-right:3px;"></i>Email cannot be changed</p>
             </div>
-
-            <div style="display:flex;gap:12px;margin-top:8px;">
-              <button type="submit" class="btn btn-primary" style="flex:1;padding:13px;">
+            <div style="display:flex;gap:12px;flex-wrap:wrap;">
+              <button type="submit" class="btn btn-primary" style="padding:12px 28px;">
                 <i class="fas fa-floppy-disk" style="margin-right:8px;"></i>Save Changes
               </button>
-              <a href="orders.html" class="btn btn-outline" style="flex:1;padding:13px;text-align:center;">
-                <i class="fas fa-list" style="margin-right:8px;"></i>My Orders
-              </a>
+              <button type="button" onclick="switchTab('orders')" class="btn btn-outline" style="padding:12px 24px;">
+                <i class="fas fa-list" style="margin-right:8px;"></i>View My Orders
+              </button>
             </div>
           </form>
         </div>
-      </div>
-    </div>
+
+        <!-- Orders Tab -->
+        <div class="profile-section anim" id="tab-orders" style="display:none;animation-delay:.05s;">
+          <div class="section-title">
+            <div class="section-title-icon"><i class="fas fa-list-check"></i></div>
+            My Orders
+          </div>
+
+          <!-- Filter tabs -->
+          <div class="tabs" id="order-tabs">
+            <button class="tab active" onclick="filterOrders('all',this)">All</button>
+            <button class="tab" onclick="filterOrders('Pending',this)">Pending</button>
+            <button class="tab" onclick="filterOrders('Preparing',this)">Preparing</button>
+            <button class="tab" onclick="filterOrders('Delivered',this)">Delivered</button>
+            <button class="tab" onclick="filterOrders('Cancelled',this)">Cancelled</button>
+          </div>
+
+          <div id="orders-list">
+            <div style="text-align:center;padding:48px;color:#9ca3af;">
+              <div style="width:24px;height:24px;border:3px solid #dc2626;border-top-color:transparent;border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 10px;"></div>
+              Loading orders...
+            </div>
+          </div>
+        </div>
+
+        <!-- Change Password Tab -->
+        <div class="profile-section anim" id="tab-pass" style="display:none;animation-delay:.05s;">
+          <div class="section-title">
+            <div class="section-title-icon"><i class="fas fa-lock"></i></div>
+            Change Password
+          </div>
+          <p style="font-size:13px;color:#6b7280;margin-bottom:20px;">Leave blank to keep your current password.</p>
+
+          <form id="pass-form">
+            <div class="form-field">
+              <label>New Password</label>
+              <div class="fi-wrap pw-wrap">
+                <i class="fas fa-lock fi"></i>
+                <input type="password" id="new-pass" placeholder="Min. 6 characters" style="padding-right:44px;">
+                <button type="button" class="pw-toggle" onclick="togglePw('new-pass','eye1')"><i id="eye1" class="fa-regular fa-eye"></i></button>
+              </div>
+            </div>
+            <div class="form-field">
+              <label>Confirm New Password</label>
+              <div class="fi-wrap pw-wrap">
+                <i class="fas fa-lock fi"></i>
+                <input type="password" id="confirm-pass" placeholder="Repeat new password" style="padding-right:44px;">
+                <button type="button" class="pw-toggle" onclick="togglePw('confirm-pass','eye2')"><i id="eye2" class="fa-regular fa-eye"></i></button>
+              </div>
+            </div>
+            <button type="submit" class="btn btn-primary" style="padding:12px 28px;">
+              <i class="fas fa-key" style="margin-right:8px;"></i>Update Password
+            </button>
+          </form>
+
+          <hr style="border:none;border-top:1px solid #f3f4f6;margin:28px 0;">
+
+          <!-- Danger zone -->
+          <div class="danger-zone">
+            <div class="danger-title"><i class="fas fa-triangle-exclamation" style="margin-right:6px;"></i>Sign Out</div>
+            <div class="danger-desc">You will be signed out of your account on this device.</div>
+            <button onclick="Auth.logout()" class="btn btn-primary" style="background:#dc2626;padding:10px 22px;font-size:14px;">
+              <i class="fas fa-sign-out-alt" style="margin-right:8px;"></i>Sign Out
+            </button>
+          </div>
+        </div>
+
+      </div><!-- /.profile-main -->
+    </div><!-- /.profile-wrap -->
   </main>
 
   <footer class="footer">
@@ -196,147 +411,218 @@
   <script>
   let newAvatarBase64 = null;
   let notifOpen = false;
+  let allOrders = [];
 
-  function togglePw(inputId, iconId) {
-    const input=document.getElementById(inputId), icon=document.getElementById(iconId);
-    if(input.type==='password'){input.type='text';icon.className='fa-regular fa-eye-slash';}
-    else{input.type='password';icon.className='fa-regular fa-eye';}
+  // ── Tab switching ─────────────────────────────────────────────
+  function switchTab(tab) {
+    ['info','orders','pass'].forEach(t => {
+      document.getElementById('tab-'+t).style.display = t===tab ? 'block' : 'none';
+      document.getElementById('tab-'+t+'-btn').classList.toggle('active', t===tab);
+    });
+    if (tab === 'orders') renderOrders('all');
   }
 
+  // ── Password toggle ───────────────────────────────────────────
+  function togglePw(id, iconId) {
+    const el=document.getElementById(id), ic=document.getElementById(iconId);
+    el.type=el.type==='password'?'text':'password';
+    ic.className=el.type==='text'?'fa-regular fa-eye-slash':'fa-regular fa-eye';
+  }
+
+  // ── Avatar change ─────────────────────────────────────────────
   function handleAvatarChange(e) {
-    const file = e.target.files[0];
-    if (!file) return;
-    if (file.size > 5 * 1024 * 1024) { Utils.showToast('Image must be under 5MB', 'error'); return; }
-    const reader = new FileReader();
-    reader.onload = (ev) => {
+    const file = e.target.files[0]; if(!file) return;
+    if(file.size > 5*1024*1024) { Utils.showToast('Image must be under 5MB','error'); return; }
+    const r = new FileReader();
+    r.onload = ev => {
       newAvatarBase64 = ev.target.result;
-      const avatarEl = document.getElementById('profile-avatar');
-      avatarEl.innerHTML = `<img src="${newAvatarBase64}" alt="Profile">`;
-      Utils.showToast('Photo selected. Click Save Changes to update.', 'info');
+      document.getElementById('profile-avatar').innerHTML = `<img src="${newAvatarBase64}" alt="Profile">`;
+      Utils.showToast('Photo selected. Click Save Changes to update.','info');
     };
-    reader.readAsDataURL(file);
+    r.readAsDataURL(file);
   }
 
-  // ── Notifications
+  // ── Order filter ──────────────────────────────────────────────
+  function filterOrders(status, btn) {
+    document.querySelectorAll('#order-tabs .tab').forEach(t=>t.classList.remove('active'));
+    if(btn) btn.classList.add('active');
+    renderOrders(status);
+  }
+
+  function renderOrders(filter) {
+    const list = document.getElementById('orders-list');
+    const filtered = filter==='all' ? allOrders : allOrders.filter(o=>(o.status||o.STATUS||'')=== filter);
+
+    const stClass = { Pending:'st-pending',Confirmed:'st-confirmed',Preparing:'st-preparing',Ready:'st-ready',Delivered:'st-delivered',Cancelled:'st-cancelled' };
+
+    if (!filtered.length) {
+      list.innerHTML = `<div style="text-align:center;padding:48px;color:#9ca3af;"><i class="fas fa-inbox" style="font-size:36px;display:block;margin-bottom:12px;opacity:.3;"></i>No orders found.</div>`;
+      return;
+    }
+
+    list.innerHTML = filtered.map(o => {
+      const id    = o.order_id||o.ORDER_ID;
+      const st    = o.status||o.STATUS||'Pending';
+      const total = parseFloat(o.total||o.TOTAL||0);
+      const date  = o.created_at||o.CREATED_AT;
+      const items = (o.items||[]);
+      const preview = items.length ? items.slice(0,2).map(i=>i.name).join(', ')+(items.length>2?' …':'') : 'No items';
+      return `<div class="order-card" style="margin-bottom:10px;">
+        <div style="flex:1;min-width:0;">
+          <div class="order-id">ORD-${String(id).padStart(4,'0')}</div>
+          <div class="order-date">${date?new Date(date).toLocaleString('en-PH',{month:'short',day:'numeric',year:'numeric',hour:'2-digit',minute:'2-digit'}):''}</div>
+          <div class="order-items-preview"><i class="fas fa-box" style="color:#dc2626;margin-right:4px;font-size:10px;"></i>${preview}</div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;">
+          <span class="status-badge ${stClass[st]||'st-pending'}">${st}</span>
+          <span style="font-weight:800;color:#dc2626;font-size:15px;">₱${total.toFixed(2)}</span>
+          <span style="font-size:11px;color:#9ca3af;">${o.order_type||o.ORDER_TYPE||'Delivery'}</span>
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  // ── Notifications ─────────────────────────────────────────────
   async function loadNotifications() {
-    const user = Auth.getCurrentUser();
-    if (!user) return;
-    const userId = user.user_id || user.USER_ID;
+    const user = Auth.getCurrentUser(); if(!user) return;
+    const userId = user.user_id||user.USER_ID;
     try {
       const notifs = await fetch(`http://localhost:3000/api/orders/notifications/${userId}`).then(r=>r.json());
-      const unread = notifs.filter(n => !n.is_read);
+      if(!Array.isArray(notifs)) return;
+      const unread = notifs.filter(n=>!(n.is_read||n.IS_READ));
       const countEl = document.getElementById('notif-count');
-      if (unread.length > 0) { countEl.textContent = unread.length; countEl.style.display = 'flex'; }
-      else { countEl.style.display = 'none'; }
-
+      if(unread.length>0){countEl.textContent=unread.length;countEl.style.display='flex';}
+      else{countEl.style.display='none';}
       const listEl = document.getElementById('notif-list');
-      if (!notifs.length) {
-        listEl.innerHTML = '<div class="notif-empty"><i class="fas fa-bell-slash" style="font-size:24px;margin-bottom:8px;display:block;"></i>No notifications</div>';
-        return;
-      }
-      listEl.innerHTML = notifs.map(n => `
-        <div class="notif-item ${n.is_read ? '' : 'unread'}">
+      if(!notifs.length){listEl.innerHTML=`<div class="notif-empty"><i class="fas fa-bell-slash" style="font-size:24px;margin-bottom:8px;display:block;"></i>No notifications</div>`;return;}
+      listEl.innerHTML=notifs.map(n=>{
+        const isRead=n.is_read||n.IS_READ;
+        const msg=n.message||n.MESSAGE||'';
+        const time=n.created_at||n.CREATED_AT||'';
+        return `<div class="notif-item ${isRead?'':'unread'}">
           <div style="display:flex;align-items:flex-start;gap:10px;">
-            <div style="width:32px;height:32px;border-radius:50%;background:${n.is_read?'#f3f4f6':'#fef2f2'};display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-              <i class="fas fa-bag-shopping" style="font-size:13px;color:${n.is_read?'#9ca3af':'#dc2626'};"></i>
+            <div style="width:32px;height:32px;border-radius:50%;background:${isRead?'#f3f4f6':'#fef2f2'};display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+              <i class="fas fa-bag-shopping" style="font-size:13px;color:${isRead?'#9ca3af':'#dc2626'};"></i>
             </div>
             <div style="flex:1;">
-              <p style="margin:0;font-weight:${n.is_read?'400':'600'};">${n.message}</p>
-              <p style="margin:2px 0 0;font-size:11px;color:#9ca3af;">${new Date(n.created_at).toLocaleString('en-PH',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'})}</p>
+              <p style="margin:0;font-weight:${isRead?'400':'600'};color:#111;">${msg}</p>
+              <p style="margin:2px 0 0;font-size:11px;color:#9ca3af;">${time?new Date(time).toLocaleString('en-PH',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'}):''}</p>
             </div>
           </div>
-        </div>`).join('');
-    } catch (e) { /* Silent fail */ }
+        </div>`;
+      }).join('');
+    } catch(e){}
   }
 
   function toggleNotifications() {
-    const dd = document.getElementById('notif-dropdown');
-    notifOpen = !notifOpen;
-    dd.style.display = notifOpen ? 'block' : 'none';
-    if (notifOpen) loadNotifications();
+    const dd=document.getElementById('notif-dropdown');
+    notifOpen=!notifOpen; dd.style.display=notifOpen?'block':'none';
+    if(notifOpen) loadNotifications();
   }
 
   async function markAllRead() {
-    const user = Auth.getCurrentUser(); if (!user) return;
-    const userId = user.user_id || user.USER_ID;
-    await fetch(`http://localhost:3000/api/orders/notifications/${userId}/read`, { method: 'PUT' });
-    document.getElementById('notif-count').style.display = 'none';
-    loadNotifications();
+    const user=Auth.getCurrentUser(); if(!user) return;
+    const userId=user.user_id||user.USER_ID;
+    try { await fetch(`http://localhost:3000/api/orders/notifications/${userId}/read`,{method:'PUT'}); document.getElementById('notif-count').style.display='none'; loadNotifications(); } catch(e){}
   }
 
-  // Close notification dropdown on outside click
-  document.addEventListener('click', (e) => {
-    const bell = document.getElementById('notif-bell'), dd = document.getElementById('notif-dropdown');
-    if (notifOpen && !bell.contains(e.target) && !dd.contains(e.target)) {
-      notifOpen = false; dd.style.display = 'none';
-    }
+  document.addEventListener('click', e => {
+    const bell=document.getElementById('notif-bell'), dd=document.getElementById('notif-dropdown');
+    if(notifOpen&&bell&&dd&&!bell.contains(e.target)&&!dd.contains(e.target)){notifOpen=false;dd.style.display='none';}
   });
 
-  // ── Init
-  document.addEventListener('DOMContentLoaded', () => {
-    if (!Auth.isLoggedIn()) { goTo('login.html'); return; }
-    const user = Auth.getCurrentUser();
-    const name = user.full_name || user.FULL_NAME || '';
-    const initials = name.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2) || '?';
-    const avatarEl = document.getElementById('profile-avatar');
+  // ── Init ──────────────────────────────────────────────────────
+  document.addEventListener('DOMContentLoaded', async () => {
+    Cart.updateBadge();
+    NavInit.init();
+    if(!Auth.isLoggedIn()){goTo('login.html');return;}
 
-    // Set avatar — image or initials
-    if (user.profile_image) {
-      avatarEl.innerHTML = `<img src="${user.profile_image}" alt="Profile">`;
-    } else {
-      avatarEl.textContent = initials;
-    }
+    const user    = Auth.getCurrentUser();
+    const name    = user.full_name||user.FULL_NAME||'';
+    const email   = user.email||user.EMAIL||'';
+    const role    = (user.role||user.ROLE||'customer').toLowerCase();
+    const isAdmin = role==='admin';
+    const initials= name.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2)||'?';
+
+    // Sidebar info
+    document.getElementById('sidebar-name').textContent  = name||'—';
+    document.getElementById('sidebar-email').textContent = email;
+    const roleEl = document.getElementById('sidebar-role');
+    if(isAdmin){ roleEl.innerHTML='<i class="fas fa-shield-halved"></i> Admin'; roleEl.classList.add('admin-role'); }
+    else { roleEl.innerHTML='<i class="fas fa-user"></i> Customer'; }
+
+    // Avatar
+    const avatarEl = document.getElementById('profile-avatar');
+    if(user.profile_image||user.PROFILE_IMAGE){
+      avatarEl.innerHTML=`<img src="${user.profile_image||user.PROFILE_IMAGE}" alt="Profile">`;
+    }else{ avatarEl.textContent=initials; }
 
     // Pre-fill form
     const form = document.getElementById('profile-form');
-    const f = (n,v) => { const el=form.querySelector(`[name="${n}"]`); if(el) el.value=v||''; };
-    f('fullName', name);
-    f('email',    user.email || user.EMAIL);
-    f('phone',    user.phone || user.PHONE);
+    const f=(n,v)=>{const el=form.querySelector(`[name="${n}"]`);if(el)el.value=v||'';};
+    f('fullName',name); f('email',email); f('phone',user.phone||user.PHONE);
 
-    // Load order stats
-    const userId = user.user_id || user.USER_ID;
-    if (userId) {
-      fetch(`http://localhost:3000/api/orders/user/${userId}`).then(r=>r.json()).then(orders => {
-        const statsEl = document.getElementById('profile-stats');
-        const total = orders.length;
-        const pending = orders.filter(o=>o.status==='Pending').length;
-        const delivered = orders.filter(o=>o.status==='Delivered').length;
-        statsEl.innerHTML = `
-          <div class="stat-pill"><i class="fas fa-list" style="color:#dc2626;"></i>${total} Orders</div>
-          <div class="stat-pill"><i class="fas fa-clock" style="color:#f97316;"></i>${pending} Pending</div>
-          <div class="stat-pill"><i class="fas fa-circle-check" style="color:#16a34a;"></i>${delivered} Delivered</div>`;
-      }).catch(()=>{});
-      // Load notifications badge
+    // Load orders
+    const userId = user.user_id||user.USER_ID;
+    if(userId){
+      try{
+        const orders = await fetch(`http://localhost:3000/api/orders/user/${userId}`).then(r=>r.json());
+        if(Array.isArray(orders)){
+          allOrders = orders;
+          const delivered = orders.filter(o=>(o.status||o.STATUS)==='Delivered');
+          const spent = delivered.reduce((s,o)=>s+parseFloat(o.total||o.TOTAL||0),0);
+          document.getElementById('stat-total').textContent    = orders.length;
+          document.getElementById('stat-pending').textContent  = orders.filter(o=>(o.status||o.STATUS)==='Pending').length;
+          document.getElementById('stat-delivered').textContent= delivered.length;
+          document.getElementById('stat-spent').textContent    = '₱'+spent.toFixed(0);
+        }
+      }catch(e){}
       loadNotifications();
     }
 
     // Profile form submit
-    form.addEventListener('submit', async (e) => {
+    form.addEventListener('submit', async e=>{
       e.preventDefault();
-      const btn = form.querySelector('button[type=submit]');
-      btn.innerHTML = '<i class="fas fa-spinner fa-spin" style="margin-right:8px;"></i>Saving...'; btn.disabled = true;
-      const d = new FormData(form);
-      const newPass = d.get('newPassword'), confirmPass = d.get('confirmPassword');
-      if (newPass && newPass !== confirmPass) { Utils.showToast('Passwords do not match', 'error'); btn.innerHTML = '<i class="fas fa-floppy-disk" style="margin-right:8px;"></i>Save Changes'; btn.disabled=false; return; }
-      if (newPass && newPass.length < 6) { Utils.showToast('Password must be at least 6 characters', 'error'); btn.innerHTML = '<i class="fas fa-floppy-disk" style="margin-right:8px;"></i>Save Changes'; btn.disabled=false; return; }
-      try {
-        const body = { full_name: d.get('fullName'), phone: d.get('phone') };
-        if (newPass) body.password = newPass;
-        if (newAvatarBase64) body.profile_image = newAvatarBase64;
-        const res = await fetch(`http://localhost:3000/api/auth/profile/${userId}`, {
-          method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body)
-        }).then(r => r.json());
-        if (res.success) {
-          const updated = { ...user, full_name: body.full_name, phone: body.phone, FULL_NAME: body.full_name, PHONE: body.phone };
-          if (newAvatarBase64) { updated.profile_image = newAvatarBase64; updated.PROFILE_IMAGE = newAvatarBase64; }
-          localStorage.setItem('currentUser', JSON.stringify(updated));
-          Utils.showToast('Profile updated successfully!', 'success');
-          newAvatarBase64 = null;
-        } else { Utils.showToast(res.message || 'Failed to update', 'error'); }
-      } catch { Utils.showToast('Server error', 'error'); }
-      btn.innerHTML = '<i class="fas fa-floppy-disk" style="margin-right:8px;"></i>Save Changes'; btn.disabled = false;
+      const btn=form.querySelector('button[type=submit]');
+      btn.innerHTML='<i class="fas fa-spinner fa-spin" style="margin-right:8px;"></i>Saving...';btn.disabled=true;
+      const d=new FormData(form);
+      try{
+        const body={full_name:d.get('fullName'),phone:d.get('phone')};
+        if(newAvatarBase64) body.profile_image=newAvatarBase64;
+        const res=await fetch(`http://localhost:3000/api/auth/profile/${userId}`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)}).then(r=>r.json());
+        if(res.success){
+          const updated={...user,full_name:body.full_name,phone:body.phone,FULL_NAME:body.full_name,PHONE:body.phone};
+          if(newAvatarBase64){updated.profile_image=newAvatarBase64;updated.PROFILE_IMAGE=newAvatarBase64;}
+          localStorage.setItem('currentUser',JSON.stringify(updated));
+          document.getElementById('sidebar-name').textContent=body.full_name;
+          Utils.showToast('Profile updated!','success');
+          newAvatarBase64=null;
+        }else{Utils.showToast(res.message||'Failed','error');}
+      }catch{Utils.showToast('Server error','error');}
+      btn.innerHTML='<i class="fas fa-floppy-disk" style="margin-right:8px;"></i>Save Changes';btn.disabled=false;
     });
+
+    // Password form submit
+    document.getElementById('pass-form').addEventListener('submit', async e=>{
+      e.preventDefault();
+      const newPass=document.getElementById('new-pass').value;
+      const confirm=document.getElementById('confirm-pass').value;
+      if(!newPass||newPass.length<6){Utils.showToast('Password must be at least 6 characters','error');return;}
+      if(newPass!==confirm){Utils.showToast('Passwords do not match','error');return;}
+      const btn=e.target.querySelector('button[type=submit]');
+      btn.innerHTML='<i class="fas fa-spinner fa-spin" style="margin-right:8px;"></i>Updating...';btn.disabled=true;
+      try{
+        const res=await fetch(`http://localhost:3000/api/auth/profile/${userId}`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({full_name:user.full_name||user.FULL_NAME,phone:user.phone||user.PHONE,password:newPass})}).then(r=>r.json());
+        if(res.success){Utils.showToast('Password updated!','success');e.target.reset();}
+        else{Utils.showToast(res.message||'Failed','error');}
+      }catch{Utils.showToast('Server error','error');}
+      btn.innerHTML='<i class="fas fa-key" style="margin-right:8px;"></i>Update Password';btn.disabled=false;
+    });
+
+    // Spin animation for loading
+    const style=document.createElement('style');
+    style.textContent='@keyframes spin{to{transform:rotate(360deg)}}';
+    document.head.appendChild(style);
   });
   </script>
 </body>
