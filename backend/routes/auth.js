@@ -17,13 +17,14 @@ router.post('/login', async (req, res) => {
   try {
     conn = await getConnection();
     const result = await conn.execute(
-      `SELECT user_id                    AS "user_id",
-              full_name                  AS "full_name",
-              email                      AS "email",
-              phone                      AS "phone",
-              role                       AS "role",
-              NVL(status,'active')       AS "status",
-              NVL(is_super_admin, 0)     AS "is_super_admin"
+      `SELECT user_id                        AS "user_id",
+              full_name                      AS "full_name",
+              email                          AS "email",
+              phone                          AS "phone",
+              role                           AS "role",
+              NVL(status,'active')           AS "status",
+              NVL(is_super_admin, 0)         AS "is_super_admin",
+              profile_image                  AS "profile_image"
        FROM users
        WHERE LOWER(email) = LOWER(:email) AND password = :password`,
       { email, password },
@@ -112,7 +113,7 @@ router.post('/register', async (req, res) => {
 
     res.json({
       success: true,
-      user: { user_id: userId, full_name, email, phone: phone || null, role: userRole, status: 'active', is_super_admin: 0 }
+      user: { user_id: userId, full_name, email, phone: phone || null, role: userRole, status: 'active', is_super_admin: 0, profile_image: null }
     });
   } catch (err) {
     console.error('Register error:', err.message);
@@ -132,9 +133,14 @@ router.post('/google', async (req, res) => {
   try {
     conn = await getConnection();
     const check = await conn.execute(
-      `SELECT user_id AS "user_id", full_name AS "full_name", email AS "email",
-              phone AS "phone", role AS "role", NVL(status,'active') AS "status",
-              NVL(is_super_admin,0) AS "is_super_admin"
+      `SELECT user_id       AS "user_id",
+              full_name     AS "full_name",
+              email         AS "email",
+              phone         AS "phone",
+              role          AS "role",
+              NVL(status,'active')     AS "status",
+              NVL(is_super_admin,0)    AS "is_super_admin",
+              profile_image            AS "profile_image"
        FROM users WHERE LOWER(email) = LOWER(:email)`,
       { email }, { outFormat: oracledb.OUT_FORMAT_OBJECT }
     );
@@ -152,7 +158,7 @@ router.post('/google', async (req, res) => {
     );
     await conn.commit();
     const userId = insert.outBinds.user_id[0];
-    res.json({ success: true, user: { user_id: userId, full_name: full_name||email, email, phone: null, role: 'customer', status: 'active', is_super_admin: 0 } });
+    res.json({ success: true, user: { user_id: userId, full_name: full_name||email, email, phone: null, role: 'customer', status: 'active', is_super_admin: 0, profile_image: null } });
   } catch (err) {
     console.error('Google auth error:', err.message);
     res.status(500).json({ success: false, message: err.message });

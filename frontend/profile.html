@@ -430,14 +430,36 @@
   }
 
   // ── Avatar change ─────────────────────────────────────────────
+  // FIX: Save the new image to localStorage immediately so it
+  //      persists across back-navigation and page refreshes,
+  //      even before the user clicks "Save Changes".
   function handleAvatarChange(e) {
-    const file = e.target.files[0]; if(!file) return;
-    if(file.size > 5*1024*1024) { Utils.showToast('Image must be under 5MB','error'); return; }
+    const file = e.target.files[0];
+    if (!file) return;
+    if (file.size > 5 * 1024 * 1024) {
+      Utils.showToast('Image must be under 5MB', 'error');
+      return;
+    }
     const r = new FileReader();
     r.onload = ev => {
       newAvatarBase64 = ev.target.result;
-      document.getElementById('profile-avatar').innerHTML = `<img src="${newAvatarBase64}" alt="Profile">`;
-      Utils.showToast('Photo selected. Click Save Changes to update.','info');
+
+      // Show preview immediately
+      document.getElementById('profile-avatar').innerHTML =
+        `<img src="${newAvatarBase64}" alt="Profile">`;
+
+      // ✅ Save to localStorage RIGHT AWAY so it survives back/refresh
+      const user = Auth.getCurrentUser();
+      if (user) {
+        const updated = {
+          ...user,
+          profile_image: newAvatarBase64,
+          PROFILE_IMAGE: newAvatarBase64
+        };
+        localStorage.setItem('currentUser', JSON.stringify(updated));
+      }
+
+      Utils.showToast('Photo selected. Click Save Changes to update.', 'info');
     };
     r.readAsDataURL(file);
   }
@@ -551,11 +573,14 @@
     if(isAdmin){ roleEl.innerHTML='<i class="fas fa-shield-halved"></i> Admin'; roleEl.classList.add('admin-role'); }
     else { roleEl.innerHTML='<i class="fas fa-user"></i> Customer'; }
 
-    // Avatar
+    // ✅ Avatar — always read fresh from localStorage so saved image is never lost
     const avatarEl = document.getElementById('profile-avatar');
-    if(user.profile_image||user.PROFILE_IMAGE){
-      avatarEl.innerHTML=`<img src="${user.profile_image||user.PROFILE_IMAGE}" alt="Profile">`;
-    }else{ avatarEl.textContent=initials; }
+    const savedImage = user.profile_image || user.PROFILE_IMAGE || null;
+    if (savedImage) {
+      avatarEl.innerHTML = `<img src="${savedImage}" alt="Profile">`;
+    } else {
+      avatarEl.textContent = initials;
+    }
 
     // Pre-fill form
     const form = document.getElementById('profile-form');
@@ -591,9 +616,19 @@
         if(newAvatarBase64) body.profile_image=newAvatarBase64;
         const res=await fetch(`http://localhost:3000/api/auth/profile/${userId}`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)}).then(r=>r.json());
         if(res.success){
-          const updated={...user,full_name:body.full_name,phone:body.phone,FULL_NAME:body.full_name,PHONE:body.phone};
-          if(newAvatarBase64){updated.profile_image=newAvatarBase64;updated.PROFILE_IMAGE=newAvatarBase64;}
-          localStorage.setItem('currentUser',JSON.stringify(updated));
+          // ✅ Always preserve the existing image when updating name/phone
+          const currentStored = Auth.getCurrentUser();
+          const existingImage = currentStored.profile_image || currentStored.PROFILE_IMAGE || null;
+          const updated = {
+            ...user,
+            full_name: body.full_name,
+            phone: body.phone,
+            FULL_NAME: body.full_name,
+            PHONE: body.phone,
+            profile_image: newAvatarBase64 || existingImage,
+            PROFILE_IMAGE: newAvatarBase64 || existingImage
+          };
+          localStorage.setItem('currentUser', JSON.stringify(updated));
           document.getElementById('sidebar-name').textContent=body.full_name;
           Utils.showToast('Profile updated!','success');
           newAvatarBase64=null;
@@ -612,9 +647,21 @@
       const btn=e.target.querySelector('button[type=submit]');
       btn.innerHTML='<i class="fas fa-spinner fa-spin" style="margin-right:8px;"></i>Updating...';btn.disabled=true;
       try{
+        // ✅ Preserve the image even when changing password
+        const currentStored = Auth.getCurrentUser();
+        const existingImage = currentStored.profile_image || currentStored.PROFILE_IMAGE || null;
         const res=await fetch(`http://localhost:3000/api/auth/profile/${userId}`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({full_name:user.full_name||user.FULL_NAME,phone:user.phone||user.PHONE,password:newPass})}).then(r=>r.json());
-        if(res.success){Utils.showToast('Password updated!','success');e.target.reset();}
-        else{Utils.showToast(res.message||'Failed','error');}
+        if(res.success){
+          // Keep image in localStorage after password change
+          const updatedUser = {
+            ...currentStored,
+            profile_image: existingImage,
+            PROFILE_IMAGE: existingImage
+          };
+          localStorage.setItem('currentUser', JSON.stringify(updatedUser));
+          Utils.showToast('Password updated!','success');
+          e.target.reset();
+        } else{Utils.showToast(res.message||'Failed','error');}
       }catch{Utils.showToast('Server error','error');}
       btn.innerHTML='<i class="fas fa-key" style="margin-right:8px;"></i>Update Password';btn.disabled=false;
     });
