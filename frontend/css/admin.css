@@ -3,28 +3,24 @@
    Save as: frontend/css/admin.css
    ============================================================ */
 
-/* ── Base reset for admin ── */
 *, *::before, *::after { box-sizing: border-box; }
 
 /* ── Hamburger button (hidden on desktop) ── */
 .sb-toggle {
   display: none;
-  position: fixed;
-  top: 10px;
-  left: 10px;
-  z-index: 12000;
-  width: 46px;
-  height: 46px;
-  border-radius: 12px;
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
   background: #dc2626;
   border: none;
   color: white;
-  font-size: 19px;
+  font-size: 17px;
   cursor: pointer;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 4px 16px rgba(220,38,38,.35);
+  box-shadow: 0 2px 8px rgba(220,38,38,.3);
   transition: transform .15s;
+  flex-shrink: 0;
 }
 .sb-toggle:active { transform: scale(.93); }
 
@@ -45,7 +41,7 @@
   transition: transform .25s cubic-bezier(.4,0,.2,1);
 }
 
-/* ── Mobile top bar (shows page title + toggle on mobile) ── */
+/* ── Mobile top bar ── */
 .admin-topbar {
   display: none;
   position: fixed;
@@ -53,15 +49,18 @@
   height: 60px;
   background: white;
   border-bottom: 1px solid #f3f4f6;
-  z-index: 9000;
+  z-index: 9500;
   align-items: center;
-  padding: 0 16px 0 68px;
+  justify-content: space-between;
+  padding: 0 14px;
+  gap: 12px;
   box-shadow: 0 2px 8px rgba(0,0,0,.06);
 }
 .admin-topbar-title {
   font-weight: 700;
   font-size: 16px;
   color: #111;
+  flex: 1;
 }
 
 /* ─────────────────────────────────────────────
@@ -113,18 +112,25 @@
     width: 100% !important;
   }
 
+  /* Notification dropdown — must be above topbar */
+  .notif-wrapper { position: static !important; }
+  .notif-dropdown {
+    position: fixed !important;
+    top: 64px !important;
+    right: 10px !important;
+    left: 10px !important;
+    width: auto !important;
+    z-index: 9800 !important;
+  }
+
   /* ── Stats — 2 col on phone ── */
   .stats-grid {
     grid-template-columns: repeat(2, 1fr) !important;
     gap: 10px !important;
   }
-  .stats-card { padding: 14px !important; }
+  .stats-card  { padding: 14px !important; }
   .stats-value { font-size: 1.4rem !important; }
-  .stats-icon {
-    width: 38px !important;
-    height: 38px !important;
-    font-size: 16px !important;
-  }
+  .stats-icon  { width: 38px !important; height: 38px !important; font-size: 16px !important; }
 
   /* ── Headings ── */
   h1 { font-size: 1.25rem !important; }
@@ -154,13 +160,13 @@
 
   /* ── Form inputs bigger touch targets ── */
   .form-input, .form-select, .form-textarea {
-    font-size: 16px !important; /* prevents iOS zoom */
+    font-size: 16px !important;
     padding: 12px 14px !important;
   }
 
   /* ── Buttons ── */
-  .btn { padding: 12px 16px !important; font-size: 14px !important; }
-  .btn-sm { padding: 8px 12px !important; font-size: 13px !important; }
+  .btn    { padding: 12px 16px !important; font-size: 14px !important; }
+  .btn-sm { padding: 8px 12px !important;  font-size: 13px !important; }
 
   /* ── Flex row → wrap ── */
   .admin-header-row {
@@ -170,9 +176,7 @@
   }
 
   /* ── Filter row stacks ── */
-  .filter-row {
-    flex-direction: column !important;
-  }
+  .filter-row { flex-direction: column !important; }
   .filter-row .form-input,
   .filter-row .form-select {
     max-width: 100% !important;
@@ -180,12 +184,12 @@
   }
 
   /* ── Grids ── */
-  .grid.grid-cols-2  { grid-template-columns: 1fr !important; }
-  .grid.grid-cols-3  { grid-template-columns: 1fr !important; }
-  .grid.grid-cols-4  { grid-template-columns: repeat(2,1fr) !important; }
-  .charts-2col       { grid-template-columns: 1fr !important; }
+  .grid.grid-cols-2 { grid-template-columns: 1fr !important; }
+  .grid.grid-cols-3 { grid-template-columns: 1fr !important; }
+  .grid.grid-cols-4 { grid-template-columns: repeat(2,1fr) !important; }
+  .charts-2col      { grid-template-columns: 1fr !important; }
 
-  /* ── Hide some desktop-only cols ── */
+  /* ── Hide desktop-only cols ── */
   .hide-mobile { display: none !important; }
 
   /* ── Card padding ── */
@@ -193,20 +197,17 @@
 
   /* ── Upload area ── */
   .upload-area { padding: 16px !important; }
-
-  /* ── Report cards ── */
-  .report-card { padding: 14px !important; }
 }
 
 /* ── Extra small phones (≤380px) ── */
 @media (max-width: 380px) {
-  .admin-content { padding: 72px 10px 24px !important; }
-  .stats-grid { grid-template-columns: repeat(2, 1fr) !important; gap: 8px !important; }
-  .stats-card { padding: 12px !important; }
-  .stats-value { font-size: 1.2rem !important; }
+  .admin-content  { padding: 72px 10px 24px !important; }
+  .stats-grid     { grid-template-columns: repeat(2, 1fr) !important; gap: 8px !important; }
+  .stats-card     { padding: 12px !important; }
+  .stats-value    { font-size: 1.2rem !important; }
   .grid.grid-cols-4 { grid-template-columns: repeat(2,1fr) !important; }
   .btn { padding: 10px 14px !important; }
-  h1 { font-size: 1.1rem !important; }
+  h1   { font-size: 1.1rem !important; }
 }
 
 /* ── Print ── */
